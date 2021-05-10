@@ -1,5 +1,11 @@
 # Restaurante-Gorm-Echo
 
+## Conexion a la base de datos
+
+```go
+    storage.New(storage.Postgres)
+```
+
 ## Migraciones
 
 ```go
