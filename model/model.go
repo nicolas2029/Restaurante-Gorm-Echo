@@ -42,9 +42,9 @@ type Establishment struct {
 	gorm.Model
 	AddressID uint    `json:"address_id"`
 	Address   Address `json:"address"`
-	Tables    []Table `json:"tables"`
-	Users     []User  `json:"users"`
-	Orders    []Order `json:"orders"`
+	Tables    []Table `json:"-"`
+	Users     []User  `json:"-"`
+	Orders    []Order `json:"-"`
 }
 
 type Permission struct {
@@ -61,24 +61,21 @@ type Rol struct {
 
 type User struct {
 	gorm.Model
-	Email           string   `gorm:"type varchar(100); not null; unique" json:"email"`
-	Password        string   `gorm:"type varchar(64); not null" json:"password"`
-	RolID           *uint    `json:"rol_id"`
-	Orders          []*Order `gorm:"many2many:order_users" json:"orders"`
-	EstablishmentID *uint    `json:"establishment_id"`
-	//Orders          []*Order `gorm:"many2many:order_users" json:"orders"`
+	Email           string  `gorm:"type varchar(100); not null; unique" json:"email"`
+	Password        string  `gorm:"type varchar(64); not null" json:"password"`
+	RolID           *uint   `json:"rol_id"`
+	Orders          []Order `json:"-"`
+	EstablishmentID *uint   `json:"establishment_id"`
 }
 
 type Order struct {
 	gorm.Model
-	PayID           uint      `json:"pi"`
-	UserID          uint      `json:"ui"`
-	EstablishmentID uint      `json:"ei"`
+	PayID           uint      `json:"pay_id"`
+	UserID          uint      `json:"user_id"`
+	EstablishmentID uint      `json:"establishment_id"`
 	Products        []Product `gorm:"many2many:order_products" json:"-"`
-	AddressID       *uint     `json:"ai"`
-	TableID         *uint     `json:"ti"`
-	//Addresses []Address `gorm:"many2many:order_addresses" json:"-"`
-	//Users     []*User   `gorm:"many2many:order_users" json:"users"`
+	AddressID       *uint     `json:"address_id"`
+	TableID         *uint     `json:"table_id"`
 }
 
 type OrderProduct struct {
@@ -89,25 +86,12 @@ type OrderProduct struct {
 	IsDone    bool `gorm:"type bool" json:"is_done"`
 }
 
-type OrderUser struct {
-	OrderID uint `gorm:"primaryKey" json:"order_id"`
-	UserID  uint `gorm:"primaryKey" json:"user_id"`
-	RolID   uint `gorm:"type uint" json:"rol_id"`
-}
-
-type OrderAddress struct {
-	OrderID   uint `gorm:"primaryKey" json:"order_id"`
-	AddressID uint `gorm:"primaryKey" json:"address_id"`
-	IsTo      bool `gorm:"type bool" json:"is_to"`
-}
-
 type Template struct {
 	Templates *template.Template
 }
 
 type OrderOrderProduct struct {
-	Order *Order `json:"order"`
-	//OrderAddress []*OrderAddress `json:"order_address"`
+	Order        *Order          `json:"order"`
 	OrderProduct []*OrderProduct `json:"order_products"`
 }
 
