@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Inner Page - Delicious Bootstrap Template</title>
+  <title>Registrar Productos</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -23,7 +23,7 @@
   <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
   <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
   <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
-
+  <script src="assets/vendor/restaurant/admin.js"></script>
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
@@ -35,13 +35,13 @@
   ======================================================== -->
 </head>
 
-<body>
+<body onload="loadAdminPage();">
 
   <!-- ======= Top Bar ======= -->
   <section id="topbar" class="d-none d-lg-flex align-items-center fixed-top ">
     <div class="container text-right">
-      <i class="icofont-phone"></i> +1 5589 55488 55
-      <i class="icofont-clock-time icofont-rotate-180"></i> Mon-Sat: 11:00 AM - 23:00 PM
+      <i class="icofont-phone"></i> +1 55 8955 4855
+      <i class="icofont-clock-time icofont-rotate-180"></i> Lun-Sáb: 10:00 AM - 11:00 PM
     </div>
   </section>
 
@@ -50,23 +50,24 @@
     <div class="container d-flex align-items-center">
 
       <div class="logo mr-auto">
-        <h1 class="text-light"><a href="index.html"><span>Delicious</span></a></h1>
+        <h1 class="text-light"><a href="index.html"><span>Beer Para Creer</span></a></h1>
         <!-- Uncomment below if you prefer to use an image logo -->
         <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li class="active"><a href="index.html">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#specials">Specials</a></li>
-          <li><a href="#events">Events</a></li>
-          <li><a href="#chefs">Chefs</a></li>
-          <li><a href="#gallery">Gallery</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li class="active"><a href="index.html">Inicio</a></li>
+          <li><a href="index.html #about">Acerca de</a></li>
+          <li><a href="index.html #menu">Menú</a></li>
+          <li id="li-my-order"></li>
+          <li><a href="index.html #events">Eventos</a></li>
+          <li><a href="index.html #chefs">Chefs</a></li>
+          <li><a href="index.html #contact">Contacto</a></li>
+          <li id="nav-orders"></li>
+          <li><a href="inner-page.html">Registrar</a></li>
 
-          <li class="book-a-table text-center"><a href="#book-a-table">Book a table</a></li>
+          <li class="book-a-table text-center" id="nav-item-session"></li>
         </ul>
       </nav><!-- .nav-menu -->
 
@@ -79,23 +80,18 @@
     <section class="breadcrumbs">
       <div class="container">
 
-        <div class="d-flex justify-content-between align-items-center">
+        <!--div class="d-flex justify-content-between align-items-center">
           <h2>Inner Page</h2>
           <ol>
             <li><a href="index.html">Home</a></li>
             <li>Inner Page</li>
           </ol>
-        </div>
+        </div-->
 
       </div>
     </section><!-- End Breadcrumbs Section -->
 
-    <section class="inner-page">
-      <div class="container">
-        <p>
-          Example inner page template
-        </p>
-      </div>
+    <section id="create-product" class="contact">
     </section>
 
   </main><!-- End #main -->
@@ -103,8 +99,8 @@
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
-      <h3>Delicious</h3>
-      <p>Et aut eum quis fuga eos sunt ipsa nihil. Labore corporis magni eligendi fuga maxime saepe commodi placeat.</p>
+      <h3>Beer Para Creer</h3>
+      <p>Con la mejor compañía, su mejor estadía.</p>
       <div class="social-links">
         <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
         <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
@@ -113,7 +109,7 @@
         <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
       <div class="copyright">
-        &copy; Copyright <strong><span>Delicious</span></strong>. All Rights Reserved
+        &copy; Copyright <strong><span>Beer Para Creer</span></strong>. All Rights Reserved
       </div>
       <div class="credits">
         <!-- All the links in the footer should remain intact. -->

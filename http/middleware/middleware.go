@@ -39,6 +39,16 @@ func authorizeLogin(c echo.Context) (model.Claim, error) {
 	return m, nil
 }
 
+func DeleteSession(c echo.Context) error {
+	cookie := sessionsCookie.Cookie()
+	sess, err := cookie.Get(c.Request(), "session")
+	if err != nil {
+		return err
+	}
+	sess.Options.MaxAge = -1
+	return cookie.Save(c.Request(), c.Response(), sess)
+}
+
 func AuthorizeWithRol(next echo.HandlerFunc, permission uint) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		m, err := authorizeLogin(c)
@@ -108,7 +118,11 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 		case sysError.ErrYouAreNotAutorized:
 			return c.JSON(http.StatusMethodNotAllowed, getMapErr(err))
 		case sysError.ErrEmptyResult:
-			return c.JSON(http.StatusNoContent, nil)
+			return c.NoContent(http.StatusNoContent)
+		case sysError.ErrInvalidEmail:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrUserNotConfirm:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		default:
 			return err
 		}

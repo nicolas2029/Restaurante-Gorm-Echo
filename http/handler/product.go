@@ -81,3 +81,11 @@ func DeleteProduct(c echo.Context) error {
 	}
 	return c.NoContent(http.StatusNoContent)
 }
+
+func SaveImage(c echo.Context) error {
+	_, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -55,7 +55,7 @@ func Address(e *echo.Echo) {
 
 func Permission(e *echo.Echo) {
 	g := e.Group("api/v1/permission")
-	g.GET("/:id", middleware.AuthorizeWithRol(handler.GetPermission, crudRol))
+	g.GET("/:id", middleware.AuthorizeIsLogin(handler.GetPermission))
 	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllPermission, crudRol))
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreatePermission, crudRol))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.UpdatePermission, crudRol))
@@ -65,7 +65,7 @@ func Permission(e *echo.Echo) {
 
 func Rol(e *echo.Echo) {
 	g := e.Group("api/v1/rol")
-	g.GET("/:id", middleware.AuthorizeWithRol(handler.GetRol, crudRol))
+	g.GET("/:id", middleware.AuthorizeIsLogin(handler.GetRol))
 	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllRol, crudRol))
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateRol, crudRol))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.UpdateRol, crudRol))
@@ -78,11 +78,12 @@ func User(e *echo.Echo) {
 	//sessions.Cookie().Get(e)
 	g.GET("/:id", middleware.AuthorizeIsUser(handler.GetUser))
 	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllUser, withoutRestrictions))
+	g.PATCH("/password/", middleware.AuthorizeIsLogin(handler.UpdateUserPassword))
 	g.POST("/", handler.CreateUser)
 	g.POST("/login/", handler.LoginUser)
-	g.GET("/login/", middleware.AuthorizeIsLogin(func(c echo.Context) error {
-		return nil
-	}))
+	g.GET("/login/", middleware.AuthorizeIsLogin(handler.GetMyUser))
+	g.GET("/logout/", middleware.DeleteSession)
+	g.GET("/validate/:code", handler.ValidateCodeConfirmation)
 	g.PUT("/:id", middleware.AuthorizeIsUser(handler.UpdateUser))
 	g.DELETE("/:id", middleware.AuthorizeIsUser(handler.DeleteUser))
 
@@ -147,7 +148,7 @@ func View(e *echo.Echo) {
 	route := "../public/views/"
 	e.Static("/", route)
 	//e.Renderer = handler.NewRender()
-	e.Static("/table/", route+"table/")
+	//e.Static("/table/", route+"table/")
 	/*e.GET("/table/", func(c echo.Context) error {
 		template.ParseFiles(route + "table/")
 		return c.Render(http.StatusOK, route+"table/", "ok")

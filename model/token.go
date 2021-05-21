@@ -27,3 +27,8 @@ type LoginResponse struct {
 		Token string `json:"token"`
 	} `json:"data"`
 }
+
+type CodeVerification struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}

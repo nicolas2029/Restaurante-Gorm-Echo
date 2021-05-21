@@ -2,7 +2,22 @@ let myMap = new Map();
 let mapProduct = new Map();
 let myOrders;
 let mapPayments = new Map();
+let myUser;
 let total=0;
+
+function updateUserEmailAndPassword() {
+    let pwd = document.getElementById("password-change-input").value
+    let data = {
+        "password":pwd
+    }
+    fetch("http://localhost:80/api/v1/user/password/", {
+        //credentials: 'same-origin',
+        method: 'PATCH',
+        body: JSON.stringify(data),
+        headers:{
+            'Content-Type': 'application/json'
+        }}).then(response => console.log(response))
+}
 
 function loadOrderProduct(product) {
     total += product.amount*mapProduct.get(product.product_id).price
@@ -17,7 +32,8 @@ function loadOrder(op, i) {
     let orderProduct = ``
     total=0;
     op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
-    order = `<div class="col-lg-4">
+    console.log(op)
+    order = `<div class="col-lg-3">
     <div class="box">
         <span>${i + 1}</span>
         <h4>Encabezado</h4>
@@ -39,7 +55,7 @@ function loadOrderSection(o) {
         <p>Aqui podras ver todos los pedidos que has realizado</p>
     </div>
     <div class="row" id="row-order">`;
-
+    console.log("0:", o)
     o.forEach((op,i) => {temp += loadOrder(op, i)});
 
     temp += `</div></div>`;
@@ -53,11 +69,14 @@ function loadAllOrders() {
             'Content-Type': 'application/json'
         }
     }).then(res => res.json().then(data => {
-        myOrders = data;
-        loadOrderSection(data);
+        console.log("data",data);
+        setMyOrders(data).then(loadOrderSection(data));
+        
     })).catch(a => console.log(a));
 }
-
+async function setMyOrders(data){
+    myOrders = data;
+}
 async function loadPaymentMethod(){
     var myInit = {method: 'GET'};
     var myRequest = new Request("http://localhost:80/api/v1/pay/", myInit);
@@ -202,7 +221,11 @@ function get(url, id, fn){
         })
     })
 }
-
+function LogOut() {
+    document.cookie = "" 
+    sessionStorage.clear()
+    fetch("http://localhost/api/v1/user/logout/",{method:"GET"}).then(location.reload())
+}
 
 function post(url) {
     var email = document.getElementById('email').value;
@@ -222,9 +245,7 @@ function post(url) {
         }).then(response => {
                 document.cookie = response.headers.get("Cookie");
                 return response.json();
-            }
-            )
-        .then(data => {
+            }).then(data => {
             sessionStorage.setItem("authorization",data.token)
             location.reload()
         });
@@ -298,22 +319,55 @@ function sectionMyOrder() {
     </div>`
 }
 
+function htmlSectionAccount(){
+    document.getElementById("nav-account").innerHTML = `<a href="#account">Mi Usuario</a>`
+    document.getElementById("account").innerHTML = `<div class="container">
+    <div class="section-title" action="" method="POST">
+        <h2><span>Cuenta de Usuario</span></h2>
+        <p>Aqui podras cambiar tu contraseña y desconectar tu usuario actual</p>
+    </div>
+    <form class="php-email-form" action="">
+        <div class="form-row">
+        <div class="col-lg-4 col-md-6 form-group">
+            <input type="password" class="form-control" id="password-change-input" name="password"  placeholder="Ingresa una contraseña" oninput="isChangePasswordValid()">
+            <span id="password-change-error">Contraseña no valida</span>
+        </div>
+        <div class="text-center"><button id="password-change" type="button" disabled onclick="updateUserEmailAndPassword()">Cambiar contraseña</button></div>
+    </form>
+    </div>
+    <div class="container">
+    <form class="php-email-form" action="">
+    <div class="text-center"><button id="button-logout" type="button" onclick="LogOut()">Cerrar sesion</button></div>
+    </form>
+    </div>`
+}
+
 function caseLogin() {
     
     document.getElementById("gallery").innerHTML = sectionMyOrder()
     document.getElementById("li-my-order").innerHTML = `<a href="#gallery">Mi Pedido</a>`
     document.getElementById("nav-orders").innerHTML = `<a href="#orders">Pedidos Realizados</a>`
+    htmlSectionAccount()
     loadPaymentMethod().then(() => loadAllOrders())
 }
+
+async function setMyUser(data){
+    myUser = data
+    if (myUser.rol_id != null) {
+        document.getElementById("nav-admin").innerHTML = `<a href="inner-page.html">Admin</a>`
+    }
+} 
 
 function switchCaseSession() {
     var myInit = {method: 'GET'};
     var myRequest = new Request('http://localhost:80/api/v1/user/login/', myInit);
     fetch(myRequest).then(res => {
         if (res.ok){
-            isLogin=true;
-            var temp = `<a href="#menu">Realizar pedido</a>`
-            caseLogin()
+            var temp = `<a href="#menu">Realizar pedido</a>`;
+            res.json().then(a =>{
+                setMyUser(a).then(console.log(myUser));
+                caseLogin();
+            })
         }else{
             var temp = `<a href="#book-a-table">Registrarse</a>`
             caseNotLogin()
@@ -374,8 +428,10 @@ function isChangePasswordValid(){
     if (isPassword(password)){
         console.log(password)
         document.getElementById("password-change").disabled=false
+        document.getElementById("password-change-error").innerHTML = "";
     }else{
         document.getElementById("password-change").disabled=true
+        document.getElementById("password-change-error").innerHTML = "Contraseña no valida";
     }
 }
 

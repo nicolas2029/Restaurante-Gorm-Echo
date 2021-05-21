@@ -62,7 +62,7 @@ type Permission struct {
 type Rol struct {
 	Model
 	Name        string       `gorm:"type varchar(50); not null" json:"name"`
-	Permissions []Permission `gorm:"many2many:rol_permissions" json:"-"`
+	Permissions []Permission `gorm:"many2many:rol_permissions" json:"permissions"`
 	Users       []User       `json:"-"`
 }
 
@@ -73,6 +73,7 @@ type User struct {
 	RolID           *uint   `json:"rol_id"`
 	Orders          []Order `json:"-"`
 	EstablishmentID *uint   `json:"establishment_id"`
+	IsConfirmated   bool    `json:"-" gorm:"not null; default false"`
 }
 
 type Order struct {

@@ -23,7 +23,6 @@ func GetOrder(id uint) (model.OrderOrderProduct, error) {
 	if order.ID == 0 {
 		return model.OrderOrderProduct{}, sysError.ErrEmptyResult
 	}
-	//log.Fatal("aqui 2")
 	products, err := getOrderProducts(order.ID)
 	if err != nil {
 		return model.OrderOrderProduct{}, err
@@ -53,10 +52,10 @@ func getAllOrderOrderPorducts(orders []model.Order) ([]model.OrderOrderProduct, 
 		if err != nil {
 			return []model.OrderOrderProduct{}, err
 		}
-		ms[i].Order = &v
+		order := v
+		ms[i].Order = &order
 		ms[i].OrderProduct = m
 	}
-
 	return ms, nil
 }
 
@@ -66,7 +65,6 @@ func GetAllOrderByUser(id uint) ([]model.OrderOrderProduct, error) {
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
-
 	return getAllOrderOrderPorducts(orders)
 }
 

@@ -48,3 +48,39 @@ func ValidateToken(t string) (model.Claim, error) {
 func verifyFunction(t *jwt.Token) (interface{}, error) {
 	return verifyKey, nil
 }
+
+func GenerateCodeVerification(email string) (string, error) {
+	claim := model.CodeVerification{
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
+			Issuer:    "Gomez & Raygoza",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claim)
+	signedToken, err := token.SignedString(signKey)
+	if err != nil {
+		return "", err
+	}
+
+	return signedToken, nil
+}
+
+// ValidateToken .
+func ValidateCodeVerification(t string) (model.CodeVerification, error) {
+	token, err := jwt.ParseWithClaims(t, &model.CodeVerification{}, verifyFunction)
+	if err != nil {
+		return model.CodeVerification{}, err
+	}
+	if !token.Valid {
+		return model.CodeVerification{}, sysError.ErrInvalidToken
+	}
+
+	claim, ok := token.Claims.(*model.CodeVerification)
+	if !ok {
+		return model.CodeVerification{}, sysError.ErrCannotGetClaim
+	}
+
+	return *claim, nil
+}
