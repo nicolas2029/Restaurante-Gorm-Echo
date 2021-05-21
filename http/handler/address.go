@@ -42,7 +42,7 @@ func CreateAddress(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, m)
+	return c.JSON(http.StatusCreated, m.ID)
 }
 
 func UpdateAddress(c echo.Context) error {

@@ -80,6 +80,9 @@ func User(e *echo.Echo) {
 	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllUser, withoutRestrictions))
 	g.POST("/", handler.CreateUser)
 	g.POST("/login/", handler.LoginUser)
+	g.GET("/login/", middleware.AuthorizeIsLogin(func(c echo.Context) error {
+		return nil
+	}))
 	g.PUT("/:id", middleware.AuthorizeIsUser(handler.UpdateUser))
 	g.DELETE("/:id", middleware.AuthorizeIsUser(handler.DeleteUser))
 
@@ -138,8 +141,21 @@ func Order(e *echo.Echo) {
 	g.GET("/establishment/all", middleware.AuthorizeWithRol(handler.GetAllOrdersByEstablishment, showInvoice))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
+}
+
+func View(e *echo.Echo) {
+	route := "../public/views/"
+	e.Static("/", route)
+	//e.Renderer = handler.NewRender()
+	e.Static("/table/", route+"table/")
+	/*e.GET("/table/", func(c echo.Context) error {
+		template.ParseFiles(route + "table/")
+		return c.Render(http.StatusOK, route+"table/", "ok")
+	})*/
+	//e.Static("/", route+"index.html")
 
 }
+
 func All(e *echo.Echo) {
 	e.Use(middleware.SwitchResponse)
 	Product(e)
@@ -153,4 +169,5 @@ func All(e *echo.Echo) {
 	Table(e)
 	Establishment(e)
 	Order(e)
+	View(e)
 }

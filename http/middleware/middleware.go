@@ -15,7 +15,7 @@ import (
 
 func authorizeLogin(c echo.Context) (model.Claim, error) {
 	var err error
-	if v := c.Request().Header.Get("autorization"); v != "" {
+	if v := c.Request().Header.Get("authorization"); v != "" {
 		m, err := authorization.ValidateToken(v)
 		if err != nil {
 			return model.Claim{}, err
@@ -35,7 +35,7 @@ func authorizeLogin(c echo.Context) (model.Claim, error) {
 	if err != nil {
 		return model.Claim{}, err
 	}
-	c.Request().Header.Set("autorization", v.(string))
+	c.Request().Header.Set("authorization", v.(string))
 	return m, nil
 }
 

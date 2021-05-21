@@ -2,34 +2,41 @@ package model
 
 import (
 	"html/template"
-	"io"
+	"time"
 
-	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
+type Model struct {
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
 type Product struct {
-	gorm.Model
+	Model
 	Name        string  `gorm:"type varchar(50); not null" json:"name"`
 	Price       float64 `gorm:"float; not null" json:"price"`
 	Description *string `gorm:"type varchar(100)" json:"description"`
+	Img         *string `gorm:"type varchar(100)" json:"img"`
 }
 
 type Table struct {
-	gorm.Model
+	Model
 	IsAvalaible     bool    `gorm:"type bool; not null; default true" json:"is_avalaible"`
 	Orders          []Order `json:"orders"`
 	EstablishmentID uint    `json:"establishment_id"`
 }
 
 type Pay struct {
-	gorm.Model
-	Name   string  `gorm:"type varchar(50); not null"`
-	Orders []Order `json:"orders"`
+	Model
+	Name   string  `gorm:"type varchar(50); not null" json:"name"`
+	Orders []Order `json:"-"`
 }
 
 type Address struct {
-	gorm.Model
+	Model
 	Line1      string  `gorm:"type varchar(100); not null" json:"line1"`
 	Line2      *string `gorm:"type varchar(100);" json:"line2"`
 	City       string  `gorm:"type varchar(100); not null" json:"city"`
@@ -39,7 +46,7 @@ type Address struct {
 }
 
 type Establishment struct {
-	gorm.Model
+	Model
 	AddressID uint    `json:"address_id"`
 	Address   Address `json:"address"`
 	Tables    []Table `json:"-"`
@@ -53,14 +60,14 @@ type Permission struct {
 }
 
 type Rol struct {
-	gorm.Model
+	Model
 	Name        string       `gorm:"type varchar(50); not null" json:"name"`
 	Permissions []Permission `gorm:"many2many:rol_permissions" json:"-"`
 	Users       []User       `json:"-"`
 }
 
 type User struct {
-	gorm.Model
+	Model
 	Email           string  `gorm:"type varchar(100); not null; unique" json:"email"`
 	Password        string  `gorm:"type varchar(64); not null" json:"password"`
 	RolID           *uint   `json:"rol_id"`
@@ -69,7 +76,7 @@ type User struct {
 }
 
 type Order struct {
-	gorm.Model
+	Model
 	PayID           uint      `json:"pay_id"`
 	UserID          uint      `json:"user_id"`
 	EstablishmentID uint      `json:"establishment_id"`
@@ -79,7 +86,8 @@ type Order struct {
 }
 
 type OrderProduct struct {
-	gorm.Model
+	ID uint `gorm:"primarykey" json:"id"`
+	//Model
 	OrderID   uint `gorm:"primaryKey" json:"order_id"`
 	ProductID uint `gorm:"primaryKey" json:"product_id"`
 	Amount    uint `gorm:"type uint" json:"amount"`
@@ -95,6 +103,6 @@ type OrderOrderProduct struct {
 	OrderProduct []*OrderProduct `json:"order_products"`
 }
 
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+/*func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.Templates.ExecuteTemplate(w, name, data)
-}
+}*/
