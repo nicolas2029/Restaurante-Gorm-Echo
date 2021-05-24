@@ -7,7 +7,7 @@ import (
 
 func GetPermission(id uint) (model.Permission, error) {
 	m := model.Permission{}
-	err := storage.DB().First(&m).Error
+	err := storage.DB().First(&m, id).Error
 	return m, err
 }
 

@@ -285,7 +285,7 @@ function sectionMyOrder() {
         <h2>Mi <span>Pedido</span></h2>
         <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
     </div>
-    <div>
+    <div class="container">
         <div id="shopping-cart" class="row no-gutters"></div>
         <form class="php-email-form" action="">
         <div class="form-row">

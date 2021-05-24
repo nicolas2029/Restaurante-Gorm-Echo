@@ -7,7 +7,7 @@ import (
 
 func GetRol(id uint) (model.Rol, error) {
 	m := model.Rol{}
-	err := storage.DB().Preload("Permissions").First(&m).Error
+	err := storage.DB().Preload("Permissions").First(&m, id).Error
 	return m, err
 }
 

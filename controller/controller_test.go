@@ -20,7 +20,7 @@ func TestHashAndSalt(t *testing.T) {
 
 func TestHavePermission(t *testing.T) {
 	storage.New(storage.Postgres)
-	err := controller.HavePermission(1, 1)
+	_, _, err := controller.HavePermission(1, 1)
 	if err != nil {
 		t.Fatalf("No se tiene permiso %v", err)
 	}

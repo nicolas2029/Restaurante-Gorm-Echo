@@ -7,7 +7,7 @@ import (
 
 func GetPay(id uint) (model.Pay, error) {
 	m := model.Pay{}
-	err := storage.DB().First(&m).Error
+	err := storage.DB().First(&m, id).Error
 	return m, err
 }
 

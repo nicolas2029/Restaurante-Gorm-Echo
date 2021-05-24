@@ -15,4 +15,5 @@ var (
 	ErrUserNotConfirm     = errors.New("user not confirmed")
 	ErrInvalidEmail       = errors.New("invalid email")
 	ErrEmailAlreadyInUsed = errors.New("email already in use")
+	ErrInvalidRole        = errors.New("invalid role")
 )

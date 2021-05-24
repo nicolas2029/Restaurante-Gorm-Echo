@@ -59,6 +59,10 @@ Cada permiso esta identificado por un id y posee una descripcion sobre su funcio
 
 14. CRUD Tables
 
+15. Mostrar ordenes pendientes del empleado
+
+16. Asignar rol de menor jerarquia de empleado dentro de un establecimiento
+
 ## Roles
 
 - **owner**
@@ -72,13 +76,13 @@ Cada permiso esta identificado por un id y posee una descripcion sobre su funcio
   - 12
   - 13
 - **manager**
-  - 3
   - 9
   - 10
   - 11
+  - 16
 - **waiter**
   - 5
   - 6
-  - 7
+  - 15
 - **chef**
   - 7

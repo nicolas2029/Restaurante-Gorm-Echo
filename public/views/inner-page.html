@@ -23,6 +23,8 @@
   <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
   <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
   <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
   <script src="assets/vendor/restaurant/admin.js"></script>
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -58,14 +60,15 @@
       <nav class="nav-menu d-none d-lg-block">
         <ul>
           <li class="active"><a href="index.html">Inicio</a></li>
-          <li><a href="index.html #about">Acerca de</a></li>
+          <li><a href="index.html #about">Registrar Producto Nuevo</a></li>
+          <li><a href="index.html #menu">Empleados</a></li>
           <li><a href="index.html #menu">Menú</a></li>
           <li id="li-my-order"></li>
-          <li><a href="index.html #events">Eventos</a></li>
-          <li><a href="index.html #chefs">Chefs</a></li>
-          <li><a href="index.html #contact">Contacto</a></li>
+          <li><a href="index.html #events">Pedido</a></li>
+          <li><a href="index.html #chefs">Pedidos Pendientes</a></li>
+          <li><a href="index.html #contact">Pedidos Por Establecimiento</a></li>
           <li id="nav-orders"></li>
-          <li><a href="inner-page.html">Registrar</a></li>
+          
 
           <li class="book-a-table text-center" id="nav-item-session"></li>
         </ul>
@@ -92,6 +95,257 @@
     </section><!-- End Breadcrumbs Section -->
 
     <section id="create-product" class="contact">
+    </section>
+
+    <section id="menu" class="menu">
+      <div class="container">
+
+        <div class="section-title">
+          <h2><span>Menú</span></h2>
+        </div>
+        <div class="row menu-container" id="menu-container" style="position: relative; height: 0px;"><div class="col-lg-6 menu-item">
+    <div class="menu-content">
+    <button name="button-menu" onclick="addProduct(2, 1, 'assets/img/specials-1.jpg', 'postman update 2', 131.6, 'Producto actualizado desde postman por segunda vez')">postman update 2</button><span>$131.6</span>
+    </div>
+    <div class="menu-ingredients">Producto actualizado desde postman por segunda vez</div>
+    </div><div class="col-lg-6 menu-item">
+    <div class="menu-content">
+    <button name="button-menu" onclick="addProduct(3, 1, 'assets/img/specials-2.jpg', 'Producto 3', 333.33, 'El tercer producto en la base de datos')">Producto 3</button><span>$333.33</span>
+    </div>
+    <div class="menu-ingredients">El tercer producto en la base de datos</div>
+    </div><div class="col-lg-6 menu-item">
+    <div class="menu-content">
+    <button name="button-menu" onclick="addProduct(4, 1, 'assets/img/specials-3.jpg', 'postman', 154.3, 'Producto creado desde postman')">postman</button><span>$154.3</span>
+    </div>
+    <div class="menu-ingredients">Producto creado desde postman</div>
+    </div></div>
+
+      </div>
+    </section>
+
+    
+
+    <section id="gallery" class="gallery"><div class="container-fluid">
+      <div class="section-title">
+          <h2><span>Pedido</span></h2>
+          <p>Aqui se listaran todos los productos seleccionados para realizar un pedido</p>
+      </div>
+      <div class="container">
+        
+        <form class="php-email-form" action="">
+          <div class="form-row">
+        
+          <div id="shopping-cart" class="row no-gutters"><div class="col-lg-2 col-md-3" id="product-2">
+              <div>
+                  <div class="gallery-item">
+                      <img src="assets/img/specials-1.jpg" alt="Producto actualizado desde postman por segunda vez" class="img-fluid">
+                  </div>
+                  <div align="center">
+                      <label>postman update 2</label>
+                  </div>
+                  <div>
+                      <input class="form-control" id="input-product-2" type="number" min="0" onchange="updateTotal(this.value, 131.6, 'total-product-2', 'product-2', 2)">
+                  </div>
+                  <div align="center">
+                      <label id="total-product-2">Precio Total: 131.6</label>
+                  </div>
+              </div>
+          </div><div class="col-lg-2 col-md-3" id="product-3">
+              <div>
+                  <div class="gallery-item">
+                      <img src="assets/img/specials-2.jpg" alt="El tercer producto en la base de datos" class="img-fluid">
+                  </div>
+                  <div align="center">
+                      <label>Producto 3</label>
+                  </div>
+                  <div>
+                      <input class="form-control" id="input-product-3" type="number" min="0" onchange="updateTotal(this.value, 333.33, 'total-product-3', 'product-3', 3)">
+                  </div>
+                  <div align="center">
+                      <label id="total-product-3">Precio Total: 333.33</label>
+                  </div>
+              </div>
+          </div></div>
+          
+              <div class="col-lg-4 col-md-6 form-group">
+              <select name="form-my-order" id="select-table" required=""><option value="" selected="" disabled="" hidden="">Selecciona una mesa</option></select>
+              </div>
+              <div class="mb-3">
+              </div>
+              <div class="text-center"><button type="button" >Realizar pedido</button></div>
+        </div>
+        </form>
+      </div></div>
+    </section>
+
+    <section id="hire-employee" class="gallery">
+    </section>
+
+    <section id="update-employee" class="gallery">
+    </section>
+
+    <section id="fire-employee" class="gallery">
+    </section>
+
+    <section id="hire-employee-st" class="gallery">
+    </section>
+
+    <section id="update-employee-st" class="gallery">
+    </section>
+
+    <section id="fire-employee-st" class="gallery">
+    </section>
+
+    <section id="create-establishment" class="gallery">
+      <div class="container">
+        <div class="section-title">
+        <h2>Registrar <span>Establecimiento</span></h2>
+        <p>Agrega un nuevo establecimiento</p>
+    </div>
+    </div>
+    <div class="container book-a-table">
+    <form class="php-email-form" action="">
+        <div class="form-row">
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="line1" placeholder="Ingresa la Calle y numero del local" required>
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="line2" placeholder="Ingresa la Colonia">
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="city" placeholder="Ingresa la Ciudad" required>
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="state" placeholder="Ingresa el Estado" required>
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="country" placeholder="Ingresa el Pais" value="Mexico" required>
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="text" class="form-control" id="postal_code" placeholder="Codigo Postal" required>
+          </div>
+          <div class="col-lg-4 col-md-6 form-group">
+            <input name="form-cs" type="number" class="form-control" id="amount-table" placeholder="Ingresa la cantidad de mesas" required>
+          </div>
+        </div>
+        <div class="text-center"><button type="button">Registrar establecimiento</button></div>
+    </form>
+    </div>
+    </section>
+
+    <!--  My incomplete Orders Section-->
+
+    <section id="my-incomplete-orders" class="why-us">
+      <div class="container" >
+
+        <div class="section-title">
+            <h2>Pedidos <span>Pendientes</span></h2>
+            <p>Aqui podras ver todos los pedidos pendientes que has registrado</p>
+        </div>
+        <div class="row" id="row-order"><div class="col-lg-3">
+        <div class="box">
+            <span>1</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-15T01:55:16.329748-05:00</p>
+            <p>Numero de Mesa: 2</p>
+            <p>Precio Total: 3710.7799999999997</p>
+            <h4>Productos</h4><h5 style="color: forestgreen;">postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 13</p>
+        <p>Entregados - 13</p>
+        <p>Precio total - 1710.8</p><h5 style="color: crimson;">Producto 3</h5>
+        <p>Precio unitatio - 333.33</p>
+        <p>Cantidad - 6</p>
+        <p>Entregados - 3</p>
+        <p>Precio total - 1999.98</p></div></div><div class="col-lg-3">
+        <div class="box">
+            <span>2</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-15T12:37:38.214029-05:00</p>
+            <p>Numero de Mesa: 4</p>
+            <p>Precio Total: 882.4299999999998</p>
+            <h4>Productos</h4><h5>postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 3</p>
+        <p>Precio total - 394.79999999999995</p><h5>postman</h5>
+        <p>Precio unitatio - 154.3</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 154.3</p><h5>Producto 3</h5>
+        <p>Precio unitatio - 333.33</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 333.33</p></div></div><div class="col-lg-3">
+        <div class="box">
+            <span>3</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-15T12:43:55.514609-05:00</p>
+            <p>Numero de Mesa: 5</p>
+            <p>Precio Total: 2120.8900000000003</p>
+            <h4>Productos</h4><h5>Producto 3</h5>
+        <p>Precio unitatio - 333.33</p>
+        <p>Cantidad - 3</p>
+        <p>Precio total - 999.99</p><h5>postman</h5>
+        <p>Precio unitatio - 154.3</p>
+        <p>Cantidad - 3</p>
+        <p>Precio total - 462.90000000000003</p><h5>postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 5</p>
+        <p>Precio total - 658</p></div></div><div class="col-lg-3">
+        <div class="box">
+            <span>4</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-15T12:48:58.917963-05:00</p>
+            <p>Numero de Mesa: 8</p>
+            <p>Precio Total: 1297.9</p>
+            <h4>Productos</h4><h5>postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 4</p>
+        <p>Precio total - 526.4</p><h5>postman</h5>
+        <p>Precio unitatio - 154.3</p>
+        <p>Cantidad - 5</p>
+        <p>Precio total - 771.5</p></div></div><div class="col-lg-3">
+        <div class="box">
+            <span>5</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-15T12:51:55.62907-05:00</p>
+            <p>Tipo de pago: paypal</p>
+            <p>Precio Total: 619.23</p>
+            <h4>Productos</h4><h5>postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 131.6</p><h5>postman</h5>
+        <p>Precio unitatio - 154.3</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 154.3</p><h5>Producto 3</h5>
+        <p>Precio unitatio - 333.33</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 333.33</p></div></div><div class="col-lg-3">
+        <div class="box">
+            <span>6</span>
+            <h4>Encabezado</h4>
+            <p>Fecha: 2021-05-20T18:16:21.219324-05:00</p>
+            <p>Tipo de pago: paypal</p>
+            <p>Precio Total: 1927.82</p>
+            <h4>Productos</h4><h5>postman update 2</h5>
+        <p>Precio unitatio - 131.6</p>
+        <p>Cantidad - 1</p>
+        <p>Precio total - 131.6</p><h5>Producto 3</h5>
+        <p>Precio unitatio - 333.33</p>
+        <p>Cantidad - 4</p>
+        <p>Precio total - 1333.32</p><h5>postman</h5>
+        <p>Precio unitatio - 154.3</p>
+        <p>Cantidad - 3</p>
+        <p>Precio total - 462.90000000000003</p></div></div></div></div>
+    </section>
+
+    <!--  END Section-->
+
+    <!-- Orders by Establishment Section-->
+
+    <section id="orders-by-stablishment" class="gallery">
+
+    </section>
+
+    <section id="all-orders" class="gallery">
     </section>
 
   </main><!-- End #main -->

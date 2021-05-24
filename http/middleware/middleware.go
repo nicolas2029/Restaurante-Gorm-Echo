@@ -55,10 +55,13 @@ func AuthorizeWithRol(next echo.HandlerFunc, permission uint) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		err = controller.HavePermission(m.UserID, permission)
+		rolId, establishmentId, err := controller.HavePermission(m.UserID, permission)
 		if err != nil {
 			return err
 		}
+		c.Set("claim", m)
+		c.Set("rolId", rolId)
+		c.Set("establishmentId", establishmentId)
 		return next(c)
 	}
 }
@@ -122,6 +125,8 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 		case sysError.ErrInvalidEmail:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		case sysError.ErrUserNotConfirm:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrUserNotFound:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		default:
 			return err

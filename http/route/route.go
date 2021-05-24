@@ -9,20 +9,22 @@ import (
 )
 
 const (
-	withoutRestrictions          = 1
-	crudEstablishment            = 2
-	setRol                       = 3
-	crudProduct                  = 4
-	makeOrderEstablishment       = 5
-	confirmPay                   = 6
-	showOrdersIncomplete         = 7
-	crudPayMethod                = 8
-	showInvoice                  = 9
-	setEmployeeInEstablishment   = 10
-	showEmployeesInEstablishment = 11
-	showAllEmployee              = 12
-	crudRol                      = 13
-	crudTable                    = 14
+	withoutRestrictions                = 1
+	crudEstablishment                  = 2
+	setRol                             = 3
+	crudProduct                        = 4
+	makeOrderEstablishment             = 5
+	confirmPay                         = 6
+	showOrdersIncompleteByStablishment = 7
+	crudPayMethod                      = 8
+	showInvoice                        = 9
+	setEmployeeInEstablishment         = 10
+	showEmployeesInEstablishment       = 11
+	showAllEmployee                    = 12
+	crudRol                            = 13
+	crudTable                          = 14
+	showOrdersIncompleteByUser         = 15
+	setRolInEstablishment              = 16
 )
 
 func Product(e *echo.Echo) {
@@ -32,7 +34,7 @@ func Product(e *echo.Echo) {
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateProduct, crudProduct))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.UpdateProduct, crudProduct))
 	g.DELETE("/:id", middleware.AuthorizeWithRol(handler.DeleteProduct, crudProduct))
-
+	g.POST("/img/:name", handler.SaveImage)
 }
 
 func ViewProduct(e *echo.Echo) {
@@ -66,7 +68,7 @@ func Permission(e *echo.Echo) {
 func Rol(e *echo.Echo) {
 	g := e.Group("api/v1/rol")
 	g.GET("/:id", middleware.AuthorizeIsLogin(handler.GetRol))
-	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllRol, crudRol))
+	g.GET("/", middleware.AuthorizeIsLogin(handler.GetAllRol))
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateRol, crudRol))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.UpdateRol, crudRol))
 	g.DELETE("/:id", middleware.AuthorizeWithRol(handler.DeleteRol, crudRol))
@@ -85,8 +87,18 @@ func User(e *echo.Echo) {
 	g.GET("/logout/", middleware.DeleteSession)
 	g.GET("/validate/:code", handler.ValidateCodeConfirmation)
 	g.PUT("/:id", middleware.AuthorizeIsUser(handler.UpdateUser))
-	g.DELETE("/:id", middleware.AuthorizeIsUser(handler.DeleteUser))
 
+	g.DELETE("/:id", middleware.AuthorizeIsUser(handler.DeleteUser))
+	g.PATCH("/hire/:email", middleware.AuthorizeWithRol(handler.HireEmployeeInEstablishmentAndSetRol, setRolInEstablishment))
+	g.PATCH("/fire/:email", middleware.AuthorizeWithRol(handler.FireEmployeeInEstablishmentByEmail, setRolInEstablishment))
+	g.PATCH("/rol/:email", middleware.AuthorizeWithRol(handler.UpdateEmployeeInEstablishmentByEmail, setRolInEstablishment))
+}
+
+func Admin(e *echo.Echo) {
+	g := e.Group("api/v1/admin")
+	g.PATCH("/hire/:email", middleware.AuthorizeWithRol(handler.HireEmployeeAndSetRol, setRol))
+	g.PATCH("/fire/:email", middleware.AuthorizeWithRol(handler.FireEmployeeByEmail, setRol))
+	g.PATCH("/rol/:email", middleware.AuthorizeWithRol(handler.UpdateUserRol, setRol))
 }
 
 func Pay(e *echo.Echo) {
@@ -138,7 +150,7 @@ func Order(e *echo.Echo) {
 	//g.GET("/:id", handler.GetOrder)
 	g.GET("/", middleware.AuthorizeIsLogin(handler.GetAllOrderByUser))
 	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrder))
-	g.GET("/establishment/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByEstablishment, showOrdersIncomplete))
+	g.GET("/establishment/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByEstablishment, showOrdersIncompleteByStablishment))
 	g.GET("/establishment/all", middleware.AuthorizeWithRol(handler.GetAllOrdersByEstablishment, showInvoice))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
@@ -171,4 +183,5 @@ func All(e *echo.Echo) {
 	Establishment(e)
 	Order(e)
 	View(e)
+	Admin(e)
 }

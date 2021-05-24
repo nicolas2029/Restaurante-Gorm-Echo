@@ -17,6 +17,115 @@ func GetUser(id uint) (model.User, error) {
 	return p, err
 }
 
+func UpdateUserRolByEmail(email string, rolId uint) error {
+	m := model.Rol{}
+	m.ID = rolId
+	err := storage.DB().First(&m).Error
+	if err != nil {
+		return err
+	}
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND rol > 0", email).Update("rol_id = ?", rolId)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
+func UpdateUserRolInEstablishmentByEmail(email string, rolId, establishmentId uint) error {
+	m := model.Rol{}
+	m.ID = rolId
+	err := storage.DB().First(&m).Error
+	if err != nil {
+		return err
+	}
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND establishment_id = ? AND rol > 0", email, establishmentId).Update("rol_id = ?", rolId)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
+func HireEmployeeAndSetRol(email string, rolId uint) error {
+	mRol := model.Rol{}
+	mRol.ID = rolId
+	err := storage.DB().First(&mRol).Error
+	if err != nil {
+		return err
+	}
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND rol_id IS NULL", email).Updates(map[string]interface{}{
+		"rol_id": rolId,
+	})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
+func HireEmployeeInEstablishmentAndSetRol(email string, rolId, establishmentId uint) error {
+	m := model.Establishment{}
+	m.ID = establishmentId
+	err := storage.DB().First(&m).Error
+	if err != nil {
+		return err
+	}
+
+	mRol := model.Rol{}
+	mRol.ID = rolId
+	err = storage.DB().First(&mRol).Error
+	if err != nil {
+		return err
+	}
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND rol_id IS NULL", email).Updates(map[string]interface{}{
+		"rol_id":           rolId,
+		"establishment_id": establishmentId,
+	})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
+func FireEmployeeByEmail(email string, rolId uint) error {
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND rol_id > 0 AND rol_id > ?", email, rolId).Updates(map[string]interface{}{
+		"rol_id":           nil,
+		"establishment_id": nil,
+	})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
+func FireEmployeeInEstablishmentByEmail(email string, rolId, establishmentId uint) error {
+	res := storage.DB().Model(&model.User{}).Where("email = ? AND establishment_id = ? AND rol_id > 0 AND rol_id > ?", email, establishmentId, rolId).Updates(
+		map[string]interface{}{
+			"rol_id":           nil,
+			"establishment_id": nil,
+		})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return sysError.ErrUserNotFound
+	}
+	return nil
+}
+
 // GetUsers return all products
 func GetAllUser() ([]model.User, error) {
 	ps := make([]model.User, 0)

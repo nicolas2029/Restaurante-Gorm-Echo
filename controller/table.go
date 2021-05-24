@@ -7,7 +7,7 @@ import (
 
 func GetTable(id uint) (model.Table, error) {
 	m := model.Table{}
-	err := storage.DB().First(&m).Error
+	err := storage.DB().First(&m, id).Error
 	return m, err
 }
 

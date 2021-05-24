@@ -147,6 +147,58 @@ func LoginUser(c echo.Context) error {
 	})
 }
 
+// HireEmployeeInEstablishmentAndSetRol hires an employee and assigns him to the establishment of who hired him
+func HireEmployeeInEstablishmentAndSetRol(c echo.Context) error {
+	var err error
+	m := model.User{}
+	userRolId := c.Get("rolId").(uint)
+	establishmentId := c.Get("establishmentId").(uint)
+	if err = c.Bind(&m); err != nil {
+		return err
+	}
+	if m.RolID == nil {
+		return sysError.ErrInvalidRole
+	}
+	if userRolId >= *m.RolID {
+		return sysError.ErrYouAreNotAutorized
+	}
+	email := c.Param("email")
+	return controller.HireEmployeeInEstablishmentAndSetRol(email, *m.RolID, establishmentId)
+}
+
+//FireEmployeeInEstablishmentByEmail dismiss employee of the establishment in which the petition is requested
+func FireEmployeeInEstablishmentByEmail(c echo.Context) error {
+	var err error
+	m := model.User{}
+	userRolId := c.Get("rolId").(uint)
+	establishmentId := c.Get("establishmentId").(uint)
+	if err = c.Bind(&m); err != nil {
+		return err
+	}
+	email := c.Param("email")
+	return controller.FireEmployeeInEstablishmentByEmail(email, userRolId, establishmentId)
+}
+
+// UpdateEmployeeInEstablishmentByEmail updates the employee of the establishment where the request is requested
+func UpdateEmployeeInEstablishmentByEmail(c echo.Context) error {
+	var err error
+	m := model.User{}
+	userRolId := c.Get("rolId").(uint)
+	establishmentId := c.Get("establishmentId").(uint)
+	if err = c.Bind(&m); err != nil {
+		return err
+	}
+	if m.RolID == nil {
+		return sysError.ErrInvalidRole
+	}
+	if userRolId >= *m.RolID {
+		return sysError.ErrYouAreNotAutorized
+	}
+
+	email := c.Param("email")
+	return controller.UpdateUserRolInEstablishmentByEmail(email, *m.RolID, establishmentId)
+}
+
 func ValidateCodeConfirmation(c echo.Context) error {
 	token := c.Param("code")
 	err := controller.ValidateUser(token)

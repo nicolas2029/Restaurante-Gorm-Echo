@@ -27,27 +27,33 @@ func HashPassword(m *model.Login) error {
 	return nil
 }
 
-func HavePermission(userId, permissionId uint) error {
+func HavePermission(userId, permissionId uint) (uint, uint, error) {
+	var eId uint
 	m := model.Rol{}
 	user := model.User{}
 	err := storage.DB().First(&user, userId).Error
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 	if user.RolID == nil {
-		return sysError.ErrUserWhitoutRol
+		return 0, 0, sysError.ErrUserWhitoutRol
 	}
 	id := *user.RolID
 	err = storage.DB().Preload("Permissions", "id = ? OR id = 1", permissionId).First(&m, id).Error
 
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 
 	if len(m.Permissions) == 0 {
-		return sysError.ErrYouAreNotAutorized
+		return 0, 0, sysError.ErrYouAreNotAutorized
 	}
-	return nil
+
+	eId = 0
+	if user.EstablishmentID != nil {
+		eId = *user.EstablishmentID
+	}
+	return id, eId, nil
 }
 
 func isPasswordValid(pwd string) bool {
