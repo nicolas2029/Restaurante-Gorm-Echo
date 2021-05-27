@@ -45,6 +45,24 @@ func CreateEstablishment(c echo.Context) error {
 	return c.JSON(http.StatusCreated, m)
 }
 
+func CreateEstablishmentWithTables(c echo.Context) error {
+	var err error
+	m := &model.Establishment{}
+	if err = c.Bind(m); err != nil {
+		return err
+	}
+	amount, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	err = controller.CreateEstablishmentWithTables(m, amount)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusCreated, m)
+}
+
 func UpdateEstablishment(c echo.Context) error {
 	var err error
 	id, err := strconv.ParseUint(c.Param("id"), 10, 0)

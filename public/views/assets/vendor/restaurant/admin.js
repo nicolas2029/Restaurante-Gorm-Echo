@@ -4,6 +4,7 @@ let nameImage;
 let myRole;
 let roles;
 let establishments;
+let mapProduct = new Map();
 
 const PERMISSIONS = {
     WhitOutRestriction:1,
@@ -15,6 +16,8 @@ function showSelectEstablishments() {
         temp += `<option value="${a.id}" >${a.id}</option>`;
     });
     document.getElementById("hire-select-establishment").innerHTML = temp;
+    temp += `<option value="0" selected >Nuevo Establecimiento</option>`
+    document.getElementById("crud-select-establishment").innerHTML = temp;
 }
 
 /*function SetEstablishments(a) {
@@ -27,6 +30,7 @@ function loadAllEstablishments(){
     fetch(`http://localhost:80/api/v1/establishment/`,{method:"GET"}).then(res => res.json().then(data => {
         console.log("rol: ",data);
         establishments = data;
+        showCRUDEstablishment();
         showHireFireAdmin();
     })).catch(a => console.log(a));
 }
@@ -140,6 +144,87 @@ function hireUserInStablishment(){
     })
 }
 
+
+function crudEstablishment(){
+    let address = document.getElementsByName("form-crud-establishment")
+    let dataAddress = {
+        "line1":address.item(0).value,
+        "line2":address.item(1).value,
+        "city":address.item(2).value,
+        "state":address.item(3).value,
+        "country":address.item(4).value,
+        "postal_code":address.item(5).value
+    };
+    let amountTables = address.item(6).value;
+    let st = address.item(7).value;
+    let myInit = {method:"POST",headers:{'Content-Type': 'application/json'}};
+    let myRequest;
+    let addressInit={
+        method:"",
+        body:JSON.stringify(dataAddress),
+        headers:{'Content-Type': 'application/json'}
+    };
+    if (st == "0"){
+        addressInit.method = "POST";
+        fetch("http://localhost:80/api/v1/address/", addressInit).then(res => res.json().then(data =>{
+            console.log(data);
+            myInit.body = JSON.stringify({address_id:data});
+            fetch(`http://localhost:80/api/v1/establishment/${amountTables}`, myInit).then(res => console.log(res));
+        }))
+    }else{
+        addressInit.method = "PUT";
+        fecht(`http://localhost:80/api/v1/address/${st}`, addressInit).then(res => console.log(res));
+    }
+}
+
+function addProduct(key, amount, src, name, price, description) {
+    let r = myMap.get(key);
+    let idInput = `input-product-${key}`;
+    if (r === undefined) {
+        let id=`total-product-${key}`;
+        let idItem = `product-${key}`;
+        let temp = 
+        `<div class="col-lg-2 col-md-3" id=${idItem}>
+            <div>
+                <div class="gallery-item">
+                    <img src="${src}" alt="${description}" class="img-fluid">
+                </div>
+                <div align="center">
+                    <label>${name}</label>
+                </div>
+                <div>
+                    <input class="form-control" id="${idInput}" type="number" min=0 onchange="updateTotal(this.value, ${price}, '${id}', '${idItem}', ${key})">
+                </div>
+                <div align="center">
+                    <label id="${id}">Precio Total: ${price}</label>
+                </div>
+            </div>
+        </div>`;
+        myMap.set(key, amount);
+        document.getElementById("shopping-cart").innerHTML += temp
+        myMap.forEach((val,keyMap) =>{
+        document.getElementById(`input-product-${keyMap}`).value=val
+    })
+    }
+    
+}
+
+function loadMenuProduct(data) {
+    var temp = 
+    `<div class="col-lg-6 menu-item">
+    <div class="menu-content">
+    <button name="button-menu" onclick="addProduct(${data.id}, 1, '${data.img}', '${data.name}', ${data.price}, '${data.description}')">${data.name}</button><span>$${data.price}</span>
+    </div>
+    <div class="menu-ingredients">${data.description}</div>
+    </div>`;
+    mapProduct.set(data.id, {
+        name:`${data.name}`,
+        price:data.price
+    });
+    return temp;
+}
+
+
 function fireUser(){
     let email = document.getElementById("fire-input-email").value;
     fetch(`http://localhost:80/api/v1/admin/fire/${email}`,{
@@ -154,6 +239,38 @@ function fireUserInStablishment(){
     })
 }
 
+function showMenu(){
+    fetch(`http://localhost:80/api/v1/product/`).then(res => res.json().then(data => {
+        let temp = "";
+        data.forEach(item => temp+=loadMenuProduct(item));
+    }))
+}
+
+function getSelectTableByEstablishment(){
+    
+}
+
+function showMyOrder(){
+    document.getElementById("my-order").innerHTML = `<div class="container-fluid">
+    <div class="section-title">
+        <h2>Nuevo <span>Pedido</span></h2>
+        <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
+    </div>
+    <div class="container">
+        <div id="shopping-cart" class="row no-gutters"></div>
+        <form class="php-email-form" action="">
+        <div class="form-row">
+            <select name="form-my-order" id="select-table" required>
+            </select>
+            </div>
+            <div class="mb-3">
+            </div>
+            <div class="text-center"><button type="button" onclick="makeOrder()">Realizar pedido</button></div>
+        </div>
+        </form>
+    </div>`;
+}
+
 function showHireFireAdmin(){
     showHireUser();
     showFireUser();
@@ -161,6 +278,46 @@ function showHireFireAdmin(){
 function showHireFireUser(){
     showHireUserInStablishment();
     showFireUserInStablishment();
+}
+
+function showCRUDEstablishment(){
+    document.getElementById("create-establishment").innerHTML = `<div class="container">
+    <div class="section-title">
+    <h2>Registrar <span>Establecimiento</span></h2>
+    <p>Agrega un nuevo establecimiento; pendiente por actualizar</p>
+    </div>
+    </div>
+    <div class="container book-a-table">
+    <form class="php-email-form" action="" >
+    <div class="form-row">
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="line1" placeholder="Ingresa la Calle y numero del local" required>
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="line2" placeholder="Ingresa la Colonia">
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="city" placeholder="Ingresa la Ciudad" required>
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="state" placeholder="Ingresa el Estado" required>
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="country" placeholder="Ingresa el Pais" value="Mexico" required>
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="text" class="form-control" id="postal_code" placeholder="Codigo Postal" required>
+        </div>
+        <div class="col-lg-4 col-md-6 form-group">
+        <input name="form-crud-establishment" type="number" class="form-control" id="amount-table" placeholder="Ingresa la cantidad de mesas" required>
+        </div>
+        <div class="col-md-6 form-group">
+        <select name="form-crud-establishment" id="crud-select-establishment" required>
+        </select>
+    </div>
+    <div class="text-center" onclick="crudEstablishment()"><button type="button">Registrar establecimiento</button></div>
+    </form>
+    </div>`
 }
 
 function showFireUser(){
@@ -345,7 +502,6 @@ function showCreateProduct(){
         <div class="form-group">
         <textarea id="input-description" class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Descripción"></textarea>
         </div>
-        <input id="submit-product" type="button" value="Submit" onclick="sendFormSetImage()">
         <div class="text-center"><button type="button" onclick="createProduct()">Registrar producto</button></div>
     </form>
     </div>
@@ -367,12 +523,13 @@ function showFunctionByPermission(id){
     console.log(id)
     switch (id) {
         case 2:
-            showCreateProduct();
+            showCreateEstablishment();
             break
         case 3:
             getAllRoles(2);
             break;
         case 4:
+            
             break;
         case 5:
             break;

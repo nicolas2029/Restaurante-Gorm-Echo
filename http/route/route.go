@@ -130,6 +130,7 @@ func Establishment(e *echo.Echo) {
 	g.GET("/", handler.GetAllEstablishment)
 	g.GET("/order/", handler.GetAllEstablishment)
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateEstablishment, crudEstablishment))
+	g.POST("/:id", middleware.AuthorizeWithRol(handler.CreateEstablishmentWithTables, crudEstablishment))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.UpdateEstablishment, crudEstablishment))
 	g.DELETE("/:id", middleware.AuthorizeWithRol(handler.DeleteEstablishment, crudEstablishment))
 

@@ -49,7 +49,7 @@ type Establishment struct {
 	Model
 	AddressID uint    `json:"address_id"`
 	Address   Address `json:"address"`
-	Tables    []Table `json:"-"`
+	Tables    []Table `json:"tables"`
 	Users     []User  `json:"-"`
 	Orders    []Order `json:"-"`
 }

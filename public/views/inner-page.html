@@ -98,84 +98,9 @@
     </section>
 
     <section id="menu" class="menu">
-      <div class="container">
-
-        <div class="section-title">
-          <h2><span>Menú</span></h2>
-        </div>
-        <div class="row menu-container" id="menu-container" style="position: relative; height: 0px;"><div class="col-lg-6 menu-item">
-    <div class="menu-content">
-    <button name="button-menu" onclick="addProduct(2, 1, 'assets/img/specials-1.jpg', 'postman update 2', 131.6, 'Producto actualizado desde postman por segunda vez')">postman update 2</button><span>$131.6</span>
-    </div>
-    <div class="menu-ingredients">Producto actualizado desde postman por segunda vez</div>
-    </div><div class="col-lg-6 menu-item">
-    <div class="menu-content">
-    <button name="button-menu" onclick="addProduct(3, 1, 'assets/img/specials-2.jpg', 'Producto 3', 333.33, 'El tercer producto en la base de datos')">Producto 3</button><span>$333.33</span>
-    </div>
-    <div class="menu-ingredients">El tercer producto en la base de datos</div>
-    </div><div class="col-lg-6 menu-item">
-    <div class="menu-content">
-    <button name="button-menu" onclick="addProduct(4, 1, 'assets/img/specials-3.jpg', 'postman', 154.3, 'Producto creado desde postman')">postman</button><span>$154.3</span>
-    </div>
-    <div class="menu-ingredients">Producto creado desde postman</div>
-    </div></div>
-
-      </div>
     </section>
 
-    
-
-    <section id="gallery" class="gallery"><div class="container-fluid">
-      <div class="section-title">
-          <h2><span>Pedido</span></h2>
-          <p>Aqui se listaran todos los productos seleccionados para realizar un pedido</p>
-      </div>
-      <div class="container">
-        
-        <form class="php-email-form" action="">
-          <div class="form-row">
-        
-          <div id="shopping-cart" class="row no-gutters"><div class="col-lg-2 col-md-3" id="product-2">
-              <div>
-                  <div class="gallery-item">
-                      <img src="assets/img/specials-1.jpg" alt="Producto actualizado desde postman por segunda vez" class="img-fluid">
-                  </div>
-                  <div align="center">
-                      <label>postman update 2</label>
-                  </div>
-                  <div>
-                      <input class="form-control" id="input-product-2" type="number" min="0" onchange="updateTotal(this.value, 131.6, 'total-product-2', 'product-2', 2)">
-                  </div>
-                  <div align="center">
-                      <label id="total-product-2">Precio Total: 131.6</label>
-                  </div>
-              </div>
-          </div><div class="col-lg-2 col-md-3" id="product-3">
-              <div>
-                  <div class="gallery-item">
-                      <img src="assets/img/specials-2.jpg" alt="El tercer producto en la base de datos" class="img-fluid">
-                  </div>
-                  <div align="center">
-                      <label>Producto 3</label>
-                  </div>
-                  <div>
-                      <input class="form-control" id="input-product-3" type="number" min="0" onchange="updateTotal(this.value, 333.33, 'total-product-3', 'product-3', 3)">
-                  </div>
-                  <div align="center">
-                      <label id="total-product-3">Precio Total: 333.33</label>
-                  </div>
-              </div>
-          </div></div>
-          
-              <div class="col-lg-4 col-md-6 form-group">
-              <select name="form-my-order" id="select-table" required=""><option value="" selected="" disabled="" hidden="">Selecciona una mesa</option></select>
-              </div>
-              <div class="mb-3">
-              </div>
-              <div class="text-center"><button type="button" >Realizar pedido</button></div>
-        </div>
-        </form>
-      </div></div>
+    <section id="my-order" class="gallery">
     </section>
 
     <section id="hire-employee" class="gallery">
@@ -197,40 +122,7 @@
     </section>
 
     <section id="create-establishment" class="gallery">
-      <div class="container">
-        <div class="section-title">
-        <h2>Registrar <span>Establecimiento</span></h2>
-        <p>Agrega un nuevo establecimiento</p>
-    </div>
-    </div>
-    <div class="container book-a-table">
-    <form class="php-email-form" action="">
-        <div class="form-row">
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="line1" placeholder="Ingresa la Calle y numero del local" required>
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="line2" placeholder="Ingresa la Colonia">
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="city" placeholder="Ingresa la Ciudad" required>
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="state" placeholder="Ingresa el Estado" required>
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="country" placeholder="Ingresa el Pais" value="Mexico" required>
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="text" class="form-control" id="postal_code" placeholder="Codigo Postal" required>
-          </div>
-          <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-cs" type="number" class="form-control" id="amount-table" placeholder="Ingresa la cantidad de mesas" required>
-          </div>
-        </div>
-        <div class="text-center"><button type="button">Registrar establecimiento</button></div>
-    </form>
-    </div>
+      
     </section>
 
     <!--  My incomplete Orders Section-->
