@@ -78,21 +78,24 @@ type User struct {
 
 type Order struct {
 	Model
-	PayID           uint      `json:"pay_id"`
-	UserID          uint      `json:"user_id"`
-	EstablishmentID uint      `json:"establishment_id"`
-	Products        []Product `gorm:"many2many:order_products" json:"-"`
+	PayID           *uint     `json:"pay_id"`
+	UserID          *uint     `json:"user_id"`
+	EstablishmentID uint      `json:"establishment_id" gorm:"not null"`
+	Products        []Product `gorm:"many2many:order_products" json:"products"`
 	AddressID       *uint     `json:"address_id"`
 	TableID         *uint     `json:"table_id"`
+	Score           *uint     `gorm:"check:Score <= 10" json:"score"`
+	IsDone          bool      `gorm:"type bool; default false; not null" json:"is_done"`
 }
 
 type OrderProduct struct {
 	ID uint `gorm:"primarykey" json:"id"`
-	//Model
+	//Price     float64 `gorm:"float; not null" json:"price"`
 	OrderID   uint `gorm:"primaryKey" json:"order_id"`
 	ProductID uint `gorm:"primaryKey" json:"product_id"`
-	Amount    uint `gorm:"type uint" json:"amount"`
-	IsDone    bool `gorm:"type bool" json:"is_done"`
+	Amount    uint `gorm:"type uint; check:amount > 0; not null" json:"amount"`
+	IsDone    bool `gorm:"type bool; default false; not null" json:"is_done"`
+	//Delivered uint `gorm:"type uint; not null; default 0; check:delivered <= amount" json:"delivered"`
 }
 
 type Template struct {

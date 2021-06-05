@@ -8,7 +8,7 @@ import (
 
 func GetEstablishment(id uint) (model.Establishment, error) {
 	m := model.Establishment{}
-	err := storage.DB().Preload("Address").First(&m, id).Error
+	err := storage.DB().Preload("Address").Preload("Tables").First(&m, id).Error
 	return m, err
 }
 
@@ -41,10 +41,10 @@ func CreateEstablishmentWithTables(m *model.Establishment, amount int) error {
 	ms := make([]model.Table, amount)
 	t := model.Table{}
 	t.EstablishmentID = m.ID
+	t.IsAvalaible = true
 	for i := 0; i < amount; i++ {
 		ms[i] = t
 	}
-	//log.Fatalf("%+v", ms)
 	return storage.DB().CreateInBatches(ms, amount).Error
 }
 

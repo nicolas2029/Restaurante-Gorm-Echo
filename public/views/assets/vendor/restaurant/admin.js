@@ -5,11 +5,152 @@ let myRole;
 let roles;
 let establishments;
 let mapProduct = new Map();
+let myMap = new Map();
+let myEstablishment;
+let total = 0
+let ordersPending = new Map(); //Pendiente a ver si lo utilizare
+let mapOrderTableTable = new Map();
+let mapTableOrder = new Map();
+let mapOrderTable = new Map();
+let modal;
+
+function closeModal(){
+    modal.innerHTML = "";
+    modal.style.display = "none";
+}
+
+function openModal(funcName, action){
+    modal.innerHTML = `<div class="modal-content">
+        <header class="close" id="modal-close" onclick="closeModal()">&times;</header>
+        <div class="section-title">
+        <h1 style="font-weight: bold">Confirmar<span style="color: #ffb03b"> ${action}</span></h1>
+        <p>¿Estás seguro de continuar?</p>
+        </div>
+        <div>
+        <button type="button" onclick="closeModal()" class="cancelbtn">Cancelar</button>
+        <button type="button" onclick="${funcName}()" class="deletebtn">Confirmar</button>
+        </div>
+    </div>`
+    modal.style.display = "block";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
 
 const PERMISSIONS = {
     WhitOutRestriction:1,
 
 }
+
+function deleteElementByID(id){
+	element = document.getElementById(id);	
+	if (!element){
+		alert("El elemento selecionado no existe");
+	} else {
+		parent = element.parentNode;
+		parent.removeChild(element);
+	}
+}
+
+function addOrderToPending(o) {
+    document.getElementById("row-order").innerHTML += loadOrder(o, 0);
+}
+
+function addOrderProductToOrder(tableID, products) {
+    let orderProduct = ""
+    products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    document.getElementById(`box-pending-${tableID}`).innerHTML += orderProduct;
+}
+
+function addProductsToOrder(tableID, products){
+    console.log(tableID)
+    let orderID = mapTableOrder.get(tableID)
+    fetch(`http://localhost:80/api/v1/order/${orderID}`, {
+        method:"POST",
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify(products)
+    }).then(res => {
+        if (res.ok){
+            addOrderProductToOrder(tableID, products)
+        }
+    })
+}
+
+function loadOrderProduct(product) {
+    total += product.amount*mapProduct.get(product.product_id).price
+    return `<h5>${mapProduct.get(product.product_id).name}</h5>
+    <p>Precio unitatio - ${mapProduct.get(product.product_id).price.toFixed(2)}</p>
+    <p>Cantidad - ${product.amount}</p>
+    <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price.toFixed(2)}</p>`
+}
+
+function completeOrder(orderID) {
+    fetch(`http://localhost:80/api/v1/order/${orderID}`, {
+        method:"POST",
+        headers:{'Content-Type': 'application/json'},
+    }).then(res => {
+        if (res.ok){
+            deleteElementByID(`order-pending-${orderID}`);
+            mapTableOrder.delete(mapOrderTable.get(orderID))
+            mapOrderTable.delete(orderID)
+        }})
+}
+
+function loadOrder(op, i) {                             //
+    let order; 
+    let orderProduct = ``
+    //addOrderToPending(op);
+    total=0;
+    let tableID = mapOrderTableTable.get(op.order.table_id);
+    //ordersPending.set(op.order, op) // agrega al map de ordenes pendientes
+    mapTableOrder.set(tableID, op.order.id)
+    mapOrderTable.set(op.order.id, tableID)
+    op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    order = `<div class="col-lg-3" id="order-pending-${op.order.id}">
+    <div class="box">
+    <div id="box-pending-${tableID}">
+        <span>Mesa: ${tableID}</span>
+        <h4>Encabezado</h4>
+        <p>Fecha: ${op.order.created_at}</p>
+        <p>Precio Total: ${total.toFixed(2)}</p>
+        <h4>Productos</h4>`
+    order += orderProduct
+    order += `</div><div class="text-center"><button type="button" onclick="completeOrder(${op.order.id})">Completar pedido</button></div></div></div>`;
+    return order;
+}
+
+function loadOrderSection(o) {
+    let temp = 
+    `<div class="container">
+
+    <div class="section-title">
+        <h2>Mis Pedidos <span>Pendientes</span></h2>
+        <p>Aqui podras ver todos los pedidos sin completar que has realizado</p>
+    </div>
+    <div class="row" id="row-order">`;
+    if (o != null){
+        o.forEach((op,i) => {temp += loadOrder(op, i)});
+    }
+    temp += `</div></div>`;
+    document.getElementById("my-incomplete-orders").innerHTML=temp
+}
+
+
+function updateTotal(amount, price, id, item, key) {
+    if (amount > 0){
+        document.getElementById(id).innerText= `Precio Total: ${amount*price}`;
+        myMap.set(key, amount);
+    }else{
+        let node = document.getElementById(item);
+        node.parentNode.removeChild(node);
+        myMap.delete(key);
+    }
+}
+
 function showSelectEstablishments() {
     let temp = `<option value="" selected disabled hidden>Selecciona un establecimiento</option>`;
     establishments.forEach(a => {
@@ -28,15 +169,23 @@ function showSelectEstablishments() {
 
 function loadAllEstablishments(){
     fetch(`http://localhost:80/api/v1/establishment/`,{method:"GET"}).then(res => res.json().then(data => {
-        console.log("rol: ",data);
         establishments = data;
+
         showCRUDEstablishment();
         showHireFireAdmin();
     })).catch(a => console.log(a));
 }
 function SetMyAdmin(a) {
     myAdmin = a;
+    showMenu();
     getMyRolePermissions();
+}
+
+function loadMyEstablishments(){
+    fetch(`http://localhost:80/api/v1/establishment/${myAdmin.establishment_id}`,{method:"GET"}).then(res => res.json().then(data => {
+        myEstablishment = data;
+        showMyOrder();
+    })).catch(a => console.log(a));
 }
 
 /*function SetAllRoles(a) {
@@ -239,16 +388,113 @@ function fireUserInStablishment(){
     })
 }
 
+function menuEmployee(data){
+    let temp = "";
+    data.forEach(item => temp+=loadMenuProduct(item)); 
+    document.getElementById("menu").innerHTML=`<div class="container">
+    <div class="section-title">
+        <h2>Revisa nuestro sabroso <span>Menú</span></h2>
+    </div>
+    <div class="row menu-container" id="menu-container">
+    ${temp}
+    </div>
+
+    </div>`;
+}
+
+function menuAdmin(data){
+    let temp = "";
+    data.forEach(item => temp+=loadMenuProduct(item)); 
+    document.getElementById("menu").innerHTML=`<div class="container">
+    <div class="section-title">
+        <h2>Revisa nuestro sabroso <span>Menú</span></h2>
+    </div>
+    <div class="row menu-container" id="menu-container">
+    ${temp}
+    </div>
+    </div>`;
+}
+
 function showMenu(){
     fetch(`http://localhost:80/api/v1/product/`).then(res => res.json().then(data => {
         let temp = "";
-        data.forEach(item => temp+=loadMenuProduct(item));
+        data.forEach(item => temp+=loadMenuProduct(item)); 
+        document.getElementById("menu").innerHTML=`<div class="container">
+        <div class="section-title">
+            <h2>Revisa nuestro sabroso <span>Menú</span></h2>
+        </div>
+        <div class="row menu-container" id="menu-container">
+        ${temp}
+        </div>
+
+        </div>`;
+        //document.getElementById("menu-container").innerHTML = temp;
     }))
 }
 
 function getSelectTableByEstablishment(){
-    
+    let count = 1;
+    let temp =`"<option value="" selected disabled hidden>Selecciona una mesa</option>"`;
+    myEstablishment.tables.forEach(data =>{
+        console.log(data)
+        temp += `<option value="${data.id}" >${count}</option>`;
+        mapOrderTableTable.set(data.id, count);
+        count +=1;
+    })
+    return temp
 }
+
+function getAllOrdersPendingByUser(){
+    fetch("http://localhost:80/api/v1/order/user/").then(res =>
+        {
+            if (res.status == 200){
+                res.json().then(data => {
+                    loadOrderSection(data)
+                })
+            }else if(res.status == 204){
+                loadOrderSection(null)
+            }
+        })
+}
+
+function switchOrderAction(){
+    addOrderProductToOrder(tableID, op)
+}
+
+function makeOrderInEstablishment(){
+    let t = parseInt(document.getElementById("select-table").value);
+    let products = [];
+    myMap.forEach((val, key) => {
+        let p = {
+            "product_id":parseInt(key),
+            "amount":parseInt(val)
+        };
+        products.push(p);
+    });
+    //console.log(t);
+    if(mapTableOrder.has(mapOrderTableTable.get(t))){
+        addProductsToOrder(mapOrderTableTable.get(t), products)
+    }else{
+        let orderProduct = {
+            "order":{
+                "establishment_id":myAdmin.establishment_id,                                   //CAMBIAR LO DE LOS ESTABLECIMIENTOS EN AMBOS TIPOS DE ORDENES QUEDARA PENDIENTE.
+                "table_id":t
+            },
+            "order_products":products
+        };
+        fetch("http://localhost:80/api/v1/order/", {
+            //credentials: 'same-origin',
+            method: 'POST',
+            body: JSON.stringify(orderProduct),
+            headers:{
+                'Content-Type': 'application/json'
+            }}).then(res => {
+                document.getElementById("shopping-cart").innerHTML = ""
+                myMap.clear()
+                document.getElementById("select-table").value = ""
+                res.json().then(data => addOrderToPending(data))})// Limpiar formulario, agregar a ordenes pendientes
+    }
+    }
 
 function showMyOrder(){
     document.getElementById("my-order").innerHTML = `<div class="container-fluid">
@@ -265,10 +511,12 @@ function showMyOrder(){
             </div>
             <div class="mb-3">
             </div>
-            <div class="text-center"><button type="button" onclick="makeOrder()">Realizar pedido</button></div>
+            <div class="text-center"><button type="button" onclick="openModal('makeOrderInEstablishment', 'Pedido')">Realizar pedido</button></div>
         </div>
         </form>
     </div>`;
+    document.getElementById("select-table").innerHTML = getSelectTableByEstablishment();
+    getAllOrdersPendingByUser();                        //
 }
 
 function showHireFireAdmin(){
@@ -315,7 +563,7 @@ function showCRUDEstablishment(){
         <select name="form-crud-establishment" id="crud-select-establishment" required>
         </select>
     </div>
-    <div class="text-center" onclick="crudEstablishment()"><button type="button">Registrar establecimiento</button></div>
+    <div class="text-center" onclick="openModal('crudEstablishment', 'Establecimiento')"><button type="button">Registrar establecimiento</button></div>
     </form>
     </div>`
 }
@@ -333,7 +581,7 @@ function showFireUser(){
         <div class="col-md-6 form-group">
             <input type="email" name="fire-form" class="form-control" id="fire-input-email" placeholder="Email">
         </div>
-        <div class="text-center"><button type="button" onclick="fireUser()">Despedir Empleado</button></div>
+        <div class="text-center"><button type="button" onclick="openModal('fireUser', 'Despido')">Despedir Empleado</button></div>
     </form>
     </div>`;
 }
@@ -351,7 +599,7 @@ function showFireUserInStablishment(){
         <div class="col-md-6 form-group">
             <input type="email" name="fire-form-st" class="form-control" id="fire-input-email-st" placeholder="Email">
         </div>
-        <div class="text-center"><button type="button" onclick="fireUserInStablishment()">Despedir Empleado</button></div>
+        <div class="text-center"><button type="button" onclick="openModal('fireUserInStablishment', 'Despido')">Despedir Empleado</button></div>
     </form>
     </div>`;
 }
@@ -373,7 +621,7 @@ function showHireUserInStablishment(){
         <select name="hire-form-st" id="hire-select-rol-st" required>
         </select>
         </div>
-        <div class="text-center"><button type="button" onclick="hireUserInStablishment()">Contratar Empleado</button></div>
+        <div class="text-center"><button type="button" onclick="openModal('hireUserInStablishment', 'Contratación')">Contratar Empleado</button></div>
     </form>
     </div>`;
     document.getElementById("hire-select-rol-st").innerHTML = getRolesCanBeSet();
@@ -400,7 +648,7 @@ function showHireUser(){
         <select name="hire-form" id="hire-select-establishment" required>
         </select>
         </div>
-        <div class="text-center"><button type="button" onclick="hireUser()">Contratar Empleado</button></div>
+        <div class="text-center"><button type="button" onclick="openModal('hireUser', 'Contratación')">Contratar Empleado</button></div>
     </form>
     </div>`;
     document.getElementById("hire-select-rol").innerHTML = getRolesCanBeSet();
@@ -502,7 +750,7 @@ function showCreateProduct(){
         <div class="form-group">
         <textarea id="input-description" class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Descripción"></textarea>
         </div>
-        <div class="text-center"><button type="button" onclick="createProduct()">Registrar producto</button></div>
+        <div class="text-center"><button type="button" onclick="openModal('createProduct', 'Nuevo Producto')">Registrar producto</button></div>
     </form>
     </div>
     
@@ -513,6 +761,7 @@ function showCreateProduct(){
 function showAll(){
     showCreateProduct();
     getAllRoles(2);
+    //showMyOrder();
 }
 
 function showMakerOrderRemote(){
@@ -532,6 +781,7 @@ function showFunctionByPermission(id){
             
             break;
         case 5:
+            loadMyEstablishments();
             break;
         case 6:
             break;
@@ -573,6 +823,7 @@ function showAllFunctionsByPermissions(){
 }
 
 function loadAdminPage() {
+    modal = document.getElementById("myModal");
     isLogin();
 }
 

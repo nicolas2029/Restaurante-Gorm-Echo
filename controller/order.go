@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"log"
-
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/sysError"
@@ -17,7 +15,6 @@ func GetOrder(id uint) (model.OrderOrderProduct, error) {
 	order := &model.Order{}
 	err := storage.DB().Find(order, id).Error
 	if err != nil {
-		log.Fatal("aqui")
 		return model.OrderOrderProduct{}, err
 	}
 	if order.ID == 0 {
@@ -61,7 +58,7 @@ func getAllOrderOrderPorducts(orders []model.Order) ([]model.OrderOrderProduct, 
 
 func GetAllOrderByUser(id uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
-	err := storage.DB().Find(&orders, "user_id = ?", id).Error
+	err := storage.DB().Preload("Products", "deleted_at IS NOT NULL").Find(&orders, "user_id = ? AND table_id IS NULL", id).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -71,6 +68,16 @@ func GetAllOrderByUser(id uint) ([]model.OrderOrderProduct, error) {
 func GetAllOrdersPendingByEstablishment(id uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
 	err := storage.DB().Find(&orders, "establishment_id = ? AND is_done = false", id).Error
+	if err != nil {
+		return []model.OrderOrderProduct{}, err
+	}
+
+	return getAllOrderOrderPorducts(orders)
+}
+
+func GetAllOrdersPendingByUser(userID uint) ([]model.OrderOrderProduct, error) {
+	orders := []model.Order{}
+	err := storage.DB().Find(&orders, "user_id = ? AND is_done = false AND table_id IS NOT NULL", userID).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -89,14 +96,39 @@ func GetAllOrdersByEstablishment(id uint) ([]model.OrderOrderProduct, error) {
 }
 
 func CreateOrder(m *model.OrderOrderProduct) error {
+	if len(m.OrderProduct) < 1 {
+		return sysError.ErrEmptyOrder
+	}
 	r := storage.DB().Create(m.Order).Error
 	if r != nil {
 		return r
 	}
 	for _, v := range m.OrderProduct {
 		v.OrderID = m.Order.ID
+		v.IsDone = false
 	}
 	return storage.DB().CreateInBatches(m.OrderProduct, len(m.OrderProduct)).Error
+}
+
+func CompleteOrder(orderID, userID uint) error {
+	//err := updateTableStatus()
+	order := &model.Order{}
+	err := storage.DB().First(order, "id = ?", orderID).Error
+	if err != nil {
+		return err
+	}
+	if order.UserID == nil || *order.UserID != userID {
+		return sysError.ErrYouAreNotAutorized
+	}
+	//log.Fatal(order)
+	if order.IsDone {
+		return sysError.ErrOrderAlreadyCompleted
+	}
+	err = updateTableStatus(*order.TableID, true)
+	if err != nil {
+		return err
+	}
+	return storage.DB().Model(&model.Order{}).Where("id = ?", orderID).Update("is_done", true).Error
 }
 
 func UpdateOrder(m *model.Order) error {
@@ -106,4 +138,22 @@ func UpdateOrder(m *model.Order) error {
 func DeleteOrder(id uint) error {
 	r := storage.DB().Delete(&model.Order{}, id)
 	return r.Error
+}
+
+func AddProductsToOrder(m []*model.OrderProduct, orderID, userID uint) error {
+	order := &model.Order{}
+	table := &model.Table{}
+	err := storage.DB().Where("id = ? AND is_done = false AND user_id = ?", orderID, userID).First(order).Error
+	if err != nil {
+		return err
+	}
+	err = storage.DB().Where("id = ? AND is_avalaible = false", order.TableID).First(table).Error
+	if err != nil {
+		return err
+	}
+	for _, v := range m {
+		v.OrderID = orderID
+		v.IsDone = false
+	}
+	return storage.DB().CreateInBatches(m, len(m)).Error
 }

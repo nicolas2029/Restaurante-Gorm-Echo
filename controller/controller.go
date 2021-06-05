@@ -86,3 +86,12 @@ func isPasswordValid(pwd string) bool {
 
 	return hasLower && hasNumber && hasSpecial && hasUpperCase
 }
+
+func IsTableInEstablishment(tableID, establishmentID uint) (model.Table, error) {
+	m := &model.Table{}
+	err := storage.DB().Where("id = ? AND establishment_id = ?", tableID, establishmentID).First(m).Error
+	if err != nil {
+		return model.Table{}, err
+	}
+	return *m, nil
+}

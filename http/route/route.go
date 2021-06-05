@@ -138,9 +138,9 @@ func Establishment(e *echo.Echo) {
 
 func OrderRemote(e *echo.Echo) {
 	g := e.Group("api/v1/order/remote")
-	g.GET("/:id", handler.GetOrder)
-	g.GET("/", handler.GetAllOrder)
-	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrder))
+	//g.GET("/:id", handler.GetOrder)
+	//g.GET("/", handler.GetAllOrder)
+	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrderRemote))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
 
@@ -150,9 +150,12 @@ func Order(e *echo.Echo) {
 	g := e.Group("api/v1/order")
 	//g.GET("/:id", handler.GetOrder)
 	g.GET("/", middleware.AuthorizeIsLogin(handler.GetAllOrderByUser))
-	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrder))
+	g.POST("/", middleware.AuthorizeWithRol(handler.CreateOrder, makeOrderEstablishment))
+	g.PUT("/:id", middleware.AuthorizeWithRol(handler.AddProductsToOrder, makeOrderEstablishment))
 	g.GET("/establishment/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByEstablishment, showOrdersIncompleteByStablishment))
 	g.GET("/establishment/all", middleware.AuthorizeWithRol(handler.GetAllOrdersByEstablishment, showInvoice))
+	g.POST("/:id", middleware.AuthorizeWithRol(handler.CompleteOrder, makeOrderEstablishment))
+	g.GET("/user/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByUser, makeOrderEstablishment))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
 }

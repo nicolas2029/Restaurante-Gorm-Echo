@@ -844,6 +844,77 @@ section {
   box-shadow: 10px 15px 30px rgba(0, 0, 0, 0.18);
 }
 
+/*NUEVOS ESTILOS AGREGADOS*/
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 150px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 60px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Float cancel and delete buttons and add an equal width */
+.cancelbtn, .deletebtn {
+  float: left;
+  width: 50%;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  font-weight: bold;
+}
+
+/* Add a color to the cancel button */
+.cancelbtn {
+  background-color: #f35555;
+  color: black;
+}
+
+/* Add a color to the delete button */
+.deletebtn {
+  background-color: #31ee60;
+  color: black;
+}
+
+
+
+/* CAMBIO DE COLOR SOBRE BOTONES EN BOX PEDIDOS*/
+.why-us .box:hover button[type=button] {
+  background: #fff;
+  color: #ffb03b
+}
+
 .why-us .box:hover span, .why-us .box:hover h4, .why-us .box:hover p {
   color: #fff;
 }
@@ -1219,7 +1290,15 @@ section {
     transition: 0.4s;
     border-radius: 50px;
   }
-  
+
+  .box button[type="button"] {
+    background: #ffb03b;
+    border: 0;
+    padding: 10px 24px;
+    color: #fff;
+    transition: 0.4s;
+    border-radius: 50px;
+  }
   .menu .menu-content button {
     padding-right: 10px;
     padding-left: 0px;

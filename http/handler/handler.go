@@ -17,7 +17,7 @@ func createCookie(r *http.Request, w *http.ResponseWriter, token string) error {
 	}
 	s.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   1800,
+		MaxAge:   3600,
 		HttpOnly: true,
 	}
 	s.Values["token"] = token

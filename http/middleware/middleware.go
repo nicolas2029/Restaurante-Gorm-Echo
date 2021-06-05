@@ -128,6 +128,14 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		case sysError.ErrUserNotFound:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrCannotGetData:
+			return c.JSON(http.StatusInternalServerError, getMapErr(err))
+		case sysError.ErrTableNotAvailable:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrEmptyOrder:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrOrderAlreadyCompleted:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		default:
 			return err
 		}

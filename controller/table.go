@@ -30,3 +30,7 @@ func DeleteTable(id uint) error {
 	r := storage.DB().Delete(&model.Table{}, id)
 	return r.Error
 }
+
+func updateTableStatus(id uint, status bool) error {
+	return storage.DB().Model(&model.Table{}).Where("id = ? AND is_avalaible = ?", id, !status).Update("is_avalaible", status).Error
+}

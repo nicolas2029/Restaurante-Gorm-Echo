@@ -4,6 +4,32 @@ let myOrders;
 let mapPayments = new Map();
 let myUser;
 let total=0;
+let modal;
+function closeModal(){
+    modal.innerHTML = "";
+    modal.style.display = "none";
+}
+
+function openModal(funcName, action){
+    modal.innerHTML = `<div class="modal-content">
+        <header class="close" id="modal-close" onclick="closeModal()">&times;</header>
+        <div class="section-title">
+        <h1 style="font-weight: bold">Confirmar<span style="color: #ffb03b"> ${action}</span></h1>
+        <p>¿Estás seguro de continuar?</p>
+        </div>
+        <div>
+        <button type="button" onclick="closeModal()" class="cancelbtn">Cancelar</button>
+        <button type="button" onclick="${funcName}()" class="deletebtn">Confirmar</button>
+        </div>
+    </div>`
+    modal.style.display = "block";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
 
 function updateUserEmailAndPassword() {
     let pwd = document.getElementById("password-change-input").value
@@ -131,7 +157,7 @@ function makeOrder(){
                 },
                 "order_products":products
             };
-            fetch("http://localhost:80/api/v1/order/", {
+            fetch("http://localhost:80/api/v1/order/remote/", {
                 //credentials: 'same-origin',
                 method: 'POST',
                 body: JSON.stringify(orderProduct),
@@ -203,7 +229,7 @@ function loadMenuProduct(data) {
     return temp;
 }
 
-function get(url, id, fn){
+function getMenu(url, fn){
     var myInit = {method: 'GET'};
     //headers: myHeaders
     var myRequest = new Request(url, myInit);
@@ -216,7 +242,15 @@ function get(url, id, fn){
                 data.forEach((itemData) => {
                     temp += fn(itemData)
                 });
-                document.getElementById(id).innerHTML = temp;
+                document.getElementById("menu").innerHTML=`<div class="container">
+                <div class="section-title">
+                    <h2>Revisa nuestro sabroso <span>Menú</span></h2>
+                </div>
+                <div class="row menu-container" id="menu-container">
+                ${temp}
+                </div>
+        
+                </div>`;
             }
         })
     })
@@ -313,7 +347,7 @@ function sectionMyOrder() {
             </div>
             <div class="mb-3">
             </div>
-            <div class="text-center"><button type="button" onclick="makeOrder()">Realizar pedido</button></div>
+            <div class="text-center"><button type="button" onclick="openModal('makeOrder', 'Pedido')">Realizar pedido</button></div>
         </div>
         </form>
     </div>`
@@ -488,6 +522,7 @@ function isValid() {
 }
     
 function getAll() {
-    get('http://localhost:80/api/v1/product/', 'menu-container', loadMenuProduct)
-    switchCaseSession()
+    modal = document.getElementById("myModal");
+    getMenu('http://localhost:80/api/v1/product/', loadMenuProduct);
+    switchCaseSession();
 }
