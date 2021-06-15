@@ -1,34 +1,18 @@
 let myMap = new Map();
 let mapProduct = new Map();
+let mapProductUpdate = new Map();
 let myOrders;
-let mapPayments = new Map();
 let myUser;
 let total=0;
-let modal;
-function closeModal(){
-    modal.innerHTML = "";
-    modal.style.display = "none";
-}
+let last=0;
 
-function openModal(funcName, action){
-    modal.innerHTML = `<div class="modal-content">
-        <header class="close" id="modal-close" onclick="closeModal()">&times;</header>
-        <div class="section-title">
-        <h1 style="font-weight: bold">Confirmar<span style="color: #ffb03b"> ${action}</span></h1>
-        <p>¿Estás seguro de continuar?</p>
-        </div>
-        <div>
-        <button type="button" onclick="closeModal()" class="cancelbtn">Cancelar</button>
-        <button type="button" onclick="${funcName}()" class="deletebtn">Confirmar</button>
-        </div>
-    </div>`
-    modal.style.display = "block";
-}
 
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
+function fetchEstablishment() {
+    fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
+        let temp = ``;
+        obj.forEach(val => temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`);
+        document.getElementById("select-establishment").innerHTML += temp;
+    }))
 }
 
 function updateUserEmailAndPassword() {
@@ -46,29 +30,50 @@ function updateUserEmailAndPassword() {
 }
 
 function loadOrderProduct(product) {
-    total += product.amount*mapProduct.get(product.product_id).price
-    return `<h5>${mapProduct.get(product.product_id).name}</h5>
-    <p>Precio unitatio - ${mapProduct.get(product.product_id).price}</p>
-    <p>Cantidad - ${product.amount}</p>
-    <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price}</p>`
+    if(mapProduct.has(product.product_id)){
+        total += product.amount*mapProduct.get(product.product_id).price
+        return `<h5>${mapProduct.get(product.product_id).name}</h5>
+        <p>Precio unitatio - ${mapProduct.get(product.product_id).price}</p>
+        <p>Cantidad - ${product.amount}</p>
+        <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price}</p>`
+    }else{
+        total += product.amount*mapProductUpdate.get(product.product_id).price
+        return `<h5>${mapProductUpdate.get(product.product_id).name}</h5>
+        <p>Precio unitatio - ${mapProductUpdate.get(product.product_id).price}</p>
+        <p>Cantidad - ${product.amount}</p>
+        <p>Precio total - ${product.amount*mapProductUpdate.get(product.product_id).price}</p>`
+    }
+    
 }
 
 function loadOrder(op, i) {
+    console.log(op);
     let order; 
     let orderProduct = ``
     total=0;
+    if(!mapOrders.has(op.order.id)){
+        mapOrders.set(op.order.id, op);
+    }
+    if(op.order.products != null){
+        op.order.products.forEach(val => {
+            if(!mapProductUpdate.has(val.id)){
+                mapProductUpdate.set(val.id, val)
+            }
+        })
+    }
+    
     op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
-    console.log(op)
-    order = `<div class="col-lg-3">
+    order = `<div class="col-lg-3" onclick="printPDF(${op.order.id})">
     <div class="box">
         <span>${i + 1}</span>
         <h4>Encabezado</h4>
-        <p>Fecha: ${op.order.created_at}</p>
+        <p>Fecha: ${timeToString(op.order.created_at)}</p>
         <p>Tipo de pago: ${mapPayments.get(op.order.pay_id)}</p>
         <p>Precio Total: ${total}</p>
         <h4>Productos</h4>`
     order += orderProduct
     order += `</div></div>`;
+    last += 1;
     return order;
 }
 
@@ -81,11 +86,11 @@ function loadOrderSection(o) {
         <p>Aqui podras ver todos los pedidos que has realizado</p>
     </div>
     <div class="row" id="row-order">`;
-    console.log("0:", o)
-    o.forEach((op,i) => {temp += loadOrder(op, i)});
-
+    if(o != null) {
+        o.forEach((op,i) => {temp += loadOrder(op, i)});
+    }
     temp += `</div></div>`;
-    document.getElementById("orders").innerHTML=temp
+    document.getElementById("orders").innerHTML=temp;
 }
 
 function loadAllOrders() {
@@ -94,19 +99,38 @@ function loadAllOrders() {
         headers:{
             'Content-Type': 'application/json'
         }
-    }).then(res => res.json().then(data => {
-        console.log("data",data);
-        setMyOrders(data).then(loadOrderSection(data));
+    }).then(res => {
+        if (res.status != 204 && res.ok){
+            res.json().then(data => {
+            setMyOrders(data).then(loadPay(data));})
+        }else{
+            setMyOrders(null).then(loadPay(null));
+        }
+    }
         
-    })).catch(a => console.log(a));
+    ).catch(a => console.log(a));
 }
 async function setMyOrders(data){
     myOrders = data;
 }
+
+function loadPay(data){
+    if(mapPayments.size == 0){
+        fetch("http://localhost:80/api/v1/pay/").then(res => {
+            res.json().then(data => {
+                data.forEach(x => mapPayments.set(x.id, x.name));
+                loadOrderSection(data);
+            })}
+        );
+    }else{
+        loadOrderSection(data);
+    }
+}
+
 async function loadPaymentMethod(){
     var myInit = {method: 'GET'};
     var myRequest = new Request("http://localhost:80/api/v1/pay/", myInit);
-    await fetch(myRequest).then(res => {
+    fetch(myRequest).then(res => {
         res.json().then(
         data => {
             if (data.length > 0) {
@@ -124,6 +148,14 @@ async function loadPaymentMethod(){
 
 function makeOrder(){
     let address = document.getElementsByName("form-my-order")
+    let isValid = true;
+    if(myMap.size == 0){return `Necesitas agregar al menos un producto al pedido`}
+    address.forEach((value) => {
+        if (value.value == ""){
+            isValid = false;
+        }
+    })
+    if (!isValid){return `Necesitas completar el formulario`}
     let dataAddress = {
         "line1":address.item(0).value,
         "line2":address.item(1).value,
@@ -140,33 +172,44 @@ function makeOrder(){
         body: JSON.stringify(dataAddress),
         headers:{
             'Content-Type': 'application/json'
-        }}).then(response => response.json()).then(data => {
-            idAddress = data;
-            myMap.forEach((val, key) => {
-                let p = {
-                    "product_id":parseInt(key),
-                    "amount":parseInt(val)
+        }}).then(response => {
+            if (response.ok){
+                response.json().then(data => {
+                idAddress = data;
+                myMap.forEach((val, key) => {
+                    let p = {
+                        "product_id":parseInt(key),
+                        "amount":parseInt(val)
+                    };
+                    products.push(p);
+                });
+                let orderProduct = {
+                    "order":{
+                        "pay_id":parseInt(address.item(6).value),
+                        "establishment_id":parseInt(address.item(7).value),
+                        "address_id":idAddress
+                    },
+                    "order_products":products
                 };
-                products.push(p);
-            });
-            let orderProduct = {
-                "order":{
-                    "pay_id":parseInt(address.item(6).value),
-                    "establishment_id":1,
-                    "address_id":idAddress
-                },
-                "order_products":products
-            };
-            fetch("http://localhost:80/api/v1/order/remote/", {
-                //credentials: 'same-origin',
-                method: 'POST',
-                body: JSON.stringify(orderProduct),
-                headers:{
-                    'Content-Type': 'application/json'
-                }}).then(location.reload())
-            
-        });
-
+                fetch("http://localhost:80/api/v1/order/remote/", {
+                    //credentials: 'same-origin',
+                    method: 'POST',
+                    body: JSON.stringify(orderProduct),
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }}).then(res => {
+                        if (res.ok){
+                            document.getElementById("shopping-cart").innerHTML = "";
+                            myMap.clear();
+                            address.forEach((v) => v.value = ``);
+                            res.json().then(obj => document.getElementById("row-order").innerHTML += loadOrder(obj, last));
+                        }
+                        showResultFunction(res);
+                    });
+        })}else{
+            response.json().then(data => showError(translateError(data.message)));
+        }
+    });
 }
 
 function updateTotal(amount, price, id, item, key) {
@@ -277,12 +320,15 @@ function post(url) {
             'Content-Type': 'application/json'
         }
         }).then(response => {
+            if (response.ok){
                 document.cookie = response.headers.get("Cookie");
-                return response.json();
-            }).then(data => {
-            sessionStorage.setItem("authorization",data.token)
-            location.reload()
-        });
+                response.json().then(data => {sessionStorage.setItem("authorization",data.token);});
+                location.reload();
+            }else{
+                showError("Credenciales no validas")
+            }
+            
+        }).catch(err => console.log(err));
 
 }
 
@@ -314,43 +360,57 @@ function caseNotLogin() {
 }
 
 function sectionMyOrder() {
-    return`<div class="container-fluid">
-    <div class="section-title">
-        <h2>Mi <span>Pedido</span></h2>
-        <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
-    </div>
-    <div class="container">
-        <div id="shopping-cart" class="row no-gutters"></div>
-        <form class="php-email-form" action="">
-        <div class="form-row">
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="line1" placeholder="Ingresa tu Calle y numero de casa" required>
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="line2" placeholder="Ingresa tu Colonia">
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="city" placeholder="Ingresa tu Ciudad" required>
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="state" placeholder="Ingresa tu Estado" required>
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="country" placeholder="Ingresa tu Pais" value="Mexico" required>
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <input name="form-my-order" type="text" class="form-control" id="postal_code" placeholder="Codigo Postal" required>
-            </div>
-            <div class="col-lg-4 col-md-6 form-group">
-            <select name="form-my-order" id="select-payment" required>
-            </select>
-            </div>
-            <div class="mb-3">
-            </div>
-            <div class="text-center"><button type="button" onclick="openModal('makeOrder', 'Pedido')">Realizar pedido</button></div>
+    fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
+        let temp = ``;
+        obj.forEach(val => temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`);
+        document.getElementById("gallery").innerHTML = `<div class="container-fluid">
+        <div class="section-title">
+            <h2>Mi <span>Pedido</span></h2>
+            <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
         </div>
-        </form>
-    </div>`
+        <div class="container">
+            <div id="shopping-cart" class="row no-gutters"></div>
+            <form class="php-email-form" action="">
+            <div class="form-row">
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="line1" placeholder="Ingresa tu Calle y numero de casa" required>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="line2" placeholder="Ingresa tu Colonia">
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="city" placeholder="Ingresa tu Ciudad" required>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="state" placeholder="Ingresa tu Estado" required>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="country" placeholder="Ingresa tu Pais" value="Mexico" required>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <input name="form-my-order" type="text" class="form-control" id="postal_code" placeholder="Codigo Postal" required>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <div class="text-center">
+                <select name="form-my-order" id="select-payment" required>
+                </select>
+                </div>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <div class="text-center">
+                <select name="form-my-order" id="select-establishment" required>
+                <option value="" selected disabled hidden>Selecciona un Establecimiento</option>
+                ${temp}
+                </select>
+                </div>
+                </div>
+                <div class="col-lg-4 col-md-6 form-group">
+                <div class="text-center"><button type="button" onclick="openModal('makeOrder', 'Pedido')">Realizar pedido</button></div></div>
+            </div>
+            </form>
+        </div>`;
+        loadPaymentMethod().then(() => loadAllOrders());
+    }))
 }
 
 function htmlSectionAccount(){
@@ -378,17 +438,16 @@ function htmlSectionAccount(){
 
 function caseLogin() {
     
-    document.getElementById("gallery").innerHTML = sectionMyOrder()
-    document.getElementById("li-my-order").innerHTML = `<a href="#gallery">Mi Pedido</a>`
-    document.getElementById("nav-orders").innerHTML = `<a href="#orders">Pedidos Realizados</a>`
-    htmlSectionAccount()
-    loadPaymentMethod().then(() => loadAllOrders())
+    sectionMyOrder();
+    document.getElementById("li-my-order").innerHTML = `<a href="#gallery">Mi Pedido</a>`;
+    document.getElementById("nav-orders").innerHTML = `<a href="#orders">Pedidos Realizados</a>`;
+    htmlSectionAccount();
 }
 
 async function setMyUser(data){
     myUser = data
     if (myUser.rol_id != null) {
-        document.getElementById("nav-admin").innerHTML = `<a href="inner-page.html">Admin</a>`
+        document.getElementById("nav-admin").innerHTML = `<a href="admin.html">Admin</a>`
     }
 } 
 

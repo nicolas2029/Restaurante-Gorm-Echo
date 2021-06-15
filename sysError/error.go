@@ -20,4 +20,5 @@ var (
 	ErrTableNotAvailable     = errors.New("table not available")
 	ErrEmptyOrder            = errors.New("empty order")
 	ErrOrderAlreadyCompleted = errors.New("order already completed")
+	ErrEmptyAddress          = errors.New("empty address")
 )

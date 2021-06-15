@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
 )
@@ -14,7 +16,7 @@ func GetProduct(id uint) (model.Product, error) {
 // GetProducts return all products
 func GetAllProduct() ([]model.Product, error) {
 	ps := make([]model.Product, 0)
-	r := storage.DB().Find(&ps)
+	r := storage.DB().Find(&ps, "updated = false")
 	return ps, r.Error
 }
 
@@ -24,10 +26,17 @@ func CreateProduct(m *model.Product) error {
 }
 
 func UpdateProduct(m *model.Product) error {
-	return storage.DB().Save(m).Error
+	err := storage.DB().Model(&model.Product{}).Where("id = ?", m.ID).Update("updated", true).Error
+	if err != nil {
+		return err
+	}
+	m.ID = 0
+	m.CreatedAt = time.Time{}
+	m.UpdatedAt = time.Time{}
+	m.Updated = false
+	return CreateProduct(m)
 }
 
 func DeleteProduct(id uint) error {
-	r := storage.DB().Delete(&model.Product{}, id)
-	return r.Error
+	return storage.DB().Model(&model.Product{}).Where("id = ?", id).Update("updated", true).Error
 }

@@ -7,7 +7,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/controller"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
+	"github.com/nicolas2029/Restaurante-Gorm-Echo/sysError"
 )
+
+func isEmptyAddress(m *model.Address) bool {
+	return len(m.City) == 0 || len(m.Line1) == 0 || len(m.Country) == 0 || len(m.PostalCode) == 0 || len(m.State) == 0
+}
 
 func GetAddress(c echo.Context) error {
 	var err error
@@ -36,7 +41,9 @@ func CreateAddress(c echo.Context) error {
 	if err = c.Bind(m); err != nil {
 		return err
 	}
-
+	if isEmptyAddress(m) {
+		return sysError.ErrEmptyAddress
+	}
 	err = controller.CreateAddress(m)
 	if err != nil {
 		return err

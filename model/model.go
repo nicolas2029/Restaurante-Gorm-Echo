@@ -16,6 +16,7 @@ type Model struct {
 
 type Product struct {
 	Model
+	Updated     bool    `gorm:"type bool; default false" json:"updated"`
 	Name        string  `gorm:"type varchar(50); not null" json:"name"`
 	Price       float64 `gorm:"float; not null" json:"price"`
 	Description *string `gorm:"type varchar(100)" json:"description"`
@@ -93,8 +94,9 @@ type OrderProduct struct {
 	//Price     float64 `gorm:"float; not null" json:"price"`
 	OrderID   uint `gorm:"primaryKey" json:"order_id"`
 	ProductID uint `gorm:"primaryKey" json:"product_id"`
-	Amount    uint `gorm:"type uint; check:amount > 0; not null" json:"amount"`
-	IsDone    bool `gorm:"type bool; default false; not null" json:"is_done"`
+	//Product   Product `json:"product"`
+	Amount uint `gorm:"type uint; check:amount > 0; not null" json:"amount"`
+	IsDone bool `gorm:"type bool; default false; not null" json:"is_done"`
 	//Delivered uint `gorm:"type uint; not null; default 0; check:delivered <= amount" json:"delivered"`
 }
 

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Registrar Productos</title>
+  <title>Admin</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -24,7 +24,8 @@
   <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
   <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
+  <script src="html2pdf.bundle.min.js"></script>
+  <script src="assets/vendor/restaurant/print.js"></script>
   <script src="assets/vendor/restaurant/admin.js"></script>
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -59,18 +60,19 @@
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li class="active"><a href="index.html">Inicio</a></li>
-          <li><a href="index.html #about">Registrar Producto Nuevo</a></li>
-          <li><a href="index.html #menu">Empleados</a></li>
-          <li><a href="index.html #menu">Menú</a></li>
-          <li id="li-my-order"></li>
-          <li><a href="index.html #events">Pedido</a></li>
-          <li><a href="index.html #chefs">Pedidos Pendientes</a></li>
-          <li><a href="index.html #contact">Pedidos Por Establecimiento</a></li>
-          <li id="nav-orders"></li>
-          
-
-          <li class="book-a-table text-center" id="nav-item-session"></li>
+          <!-- <li class="active"><a href="index.html">Inicio</a></li> -->
+          <li id="nav-menu"><a href="#menu">Menu</a></li>
+          <li id="nav-my-order"></li>
+          <li id="nav-new-product"></li>
+          <li id="nav-update-product"></li>
+          <li id="nav-my-order-pending"></li>
+          <li id="nav-order-pending"></li>
+          <li id="nav-order-st"></li>
+          <li id="nav-hire"></li>
+          <li id="nav-fire"></li>
+          <li id="nav-hire-st"></li>
+          <li id="nav-fire-st"></li>
+          <li id="nav-create-establishment"></li>
         </ul>
       </nav><!-- .nav-menu -->
 
@@ -90,54 +92,57 @@
             <li>Inner Page</li>
           </ol>
         </div-->
-
+        
       </div>
     </section><!-- End Breadcrumbs Section -->
-
-    <section id="create-product" class="contact">
+    
+    <section id="menu" class="menu" name="section-nav">
+    </section>
+    
+    <section id="my-order" class="gallery" name="section-nav">
     </section>
 
-    <section id="menu" class="menu">
+    <section id="create-product" class="contact" name="section-nav">
+    </section>
+    
+    <section id="update-product" class="contact" name="section-nav">
+    </section>
+    
+    <section id="my-incomplete-orders" class="why-us" name="section-nav">
     </section>
 
-    <section id="my-order" class="gallery">
+    <section id="order-pending-e" class="why-us" name="section-nav">
     </section>
 
-    <section id="hire-employee" class="gallery">
+    <section id="orders-by-stablishment" class="why-us" name="section-nav">
     </section>
 
-    <section id="update-employee" class="gallery">
+    <section id="hire-employee" class="gallery" name="section-nav">
     </section>
 
-    <section id="fire-employee" class="gallery">
+    <section id="update-employee" class="gallery" name="section-nav">
     </section>
 
-    <section id="hire-employee-st" class="gallery">
+    <section id="fire-employee" class="gallery" name="section-nav">
     </section>
 
-    <section id="update-employee-st" class="gallery">
+    <section id="hire-employee-st" class="gallery" name="section-nav">
     </section>
 
-    <section id="fire-employee-st" class="gallery">
+    <section id="update-employee-st" class="gallery" name="section-nav">
     </section>
 
-    <section id="create-establishment" class="gallery">
-      
+    <section id="fire-employee-st" class="gallery" name="section-nav">
     </section>
 
-    <!--  My incomplete Orders Section-->
-    <section id="my-incomplete-orders" class="why-us">
+    <section id="create-establishment" class="gallery" name="section-nav">
     </section>
 
-    <!--  END Section-->
-
-    <!-- Orders by Establishment Section-->
-
-    <section id="orders-by-stablishment" class="gallery">
-
+    <section id="crud-payment" class="gallery" name="section-nav">
     </section>
 
-    <section id="all-orders" class="gallery">
+
+    <section id="all-orders" class="why-us" name="section-nav">
     </section>
     <div id="myModal" class="modal">a</div>
   </main><!-- End #main -->

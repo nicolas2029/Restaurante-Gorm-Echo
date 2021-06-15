@@ -141,6 +141,7 @@ func OrderRemote(e *echo.Echo) {
 	//g.GET("/:id", handler.GetOrder)
 	//g.GET("/", handler.GetAllOrder)
 	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrderRemote))
+	g.PATCH("/:id", middleware.AuthorizeWithRol(handler.CompleteOrderRemote, showOrdersIncompleteByStablishment))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
 
@@ -154,7 +155,7 @@ func Order(e *echo.Echo) {
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.AddProductsToOrder, makeOrderEstablishment))
 	g.GET("/establishment/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByEstablishment, showOrdersIncompleteByStablishment))
 	g.GET("/establishment/all", middleware.AuthorizeWithRol(handler.GetAllOrdersByEstablishment, showInvoice))
-	g.POST("/:id", middleware.AuthorizeWithRol(handler.CompleteOrder, makeOrderEstablishment))
+	g.PATCH("/:id", middleware.AuthorizeWithRol(handler.CompleteOrder, makeOrderEstablishment))
 	g.GET("/user/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByUser, makeOrderEstablishment))
 	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
 	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))

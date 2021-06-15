@@ -115,7 +115,7 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 		case sysError.ErrCannotGetClaim:
 			return c.JSON(http.StatusInternalServerError, getMapErr(err))
 		case sysError.ErrUserNotLogin:
-			return c.JSON(http.StatusMethodNotAllowed, getMapErr(sysError.ErrUserNotLogin))
+			return c.JSON(http.StatusMethodNotAllowed, getMapErr(err))
 		case sysError.ErrUserWhitoutRol:
 			return c.JSON(http.StatusMethodNotAllowed, getMapErr(err))
 		case sysError.ErrYouAreNotAutorized:
@@ -135,6 +135,8 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 		case sysError.ErrEmptyOrder:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		case sysError.ErrOrderAlreadyCompleted:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrEmptyAddress:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		default:
 			return err

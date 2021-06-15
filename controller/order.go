@@ -58,7 +58,7 @@ func getAllOrderOrderPorducts(orders []model.Order) ([]model.OrderOrderProduct, 
 
 func GetAllOrderByUser(id uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
-	err := storage.DB().Preload("Products", "deleted_at IS NOT NULL").Find(&orders, "user_id = ? AND table_id IS NULL", id).Error
+	err := storage.DB().Preload("Products", "updated = true").Find(&orders, "user_id = ? AND table_id IS NULL", id).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -67,7 +67,7 @@ func GetAllOrderByUser(id uint) ([]model.OrderOrderProduct, error) {
 
 func GetAllOrdersPendingByEstablishment(id uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
-	err := storage.DB().Find(&orders, "establishment_id = ? AND is_done = false", id).Error
+	err := storage.DB().Preload("Products", "updated = true").Find(&orders, "establishment_id = ? AND is_done = false", id).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -77,7 +77,7 @@ func GetAllOrdersPendingByEstablishment(id uint) ([]model.OrderOrderProduct, err
 
 func GetAllOrdersPendingByUser(userID uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
-	err := storage.DB().Find(&orders, "user_id = ? AND is_done = false AND table_id IS NOT NULL", userID).Error
+	err := storage.DB().Preload("Products", "updated = true").Find(&orders, "user_id = ? AND is_done = false AND table_id IS NOT NULL", userID).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -87,7 +87,7 @@ func GetAllOrdersPendingByUser(userID uint) ([]model.OrderOrderProduct, error) {
 
 func GetAllOrdersByEstablishment(id uint) ([]model.OrderOrderProduct, error) {
 	orders := []model.Order{}
-	err := storage.DB().Find(&orders, "establishment_id = ?", id).Error
+	err := storage.DB().Preload("Products", "updated = true").Find(&orders, "establishment_id = ?", id).Error
 	if err != nil {
 		return []model.OrderOrderProduct{}, err
 	}
@@ -110,7 +110,7 @@ func CreateOrder(m *model.OrderOrderProduct) error {
 	return storage.DB().CreateInBatches(m.OrderProduct, len(m.OrderProduct)).Error
 }
 
-func CompleteOrder(orderID, userID uint) error {
+func CompleteOrder(orderID, userID, payID uint) error {
 	//err := updateTableStatus()
 	order := &model.Order{}
 	err := storage.DB().First(order, "id = ?", orderID).Error
@@ -128,6 +128,21 @@ func CompleteOrder(orderID, userID uint) error {
 	if err != nil {
 		return err
 	}
+	return storage.DB().Model(&model.Order{}).Where("id = ?", orderID).Updates(model.Order{IsDone: true, PayID: &payID}).Error
+}
+
+func CompleteOrderRemote(orderID, establishmentID uint) error {
+	//err := updateTableStatus()
+	order := &model.Order{}
+	err := storage.DB().First(order, "id = ? AND table_id IS NULL", orderID).Error
+	if err != nil {
+		return err
+	}
+	//log.Fatal(order)
+	if order.IsDone {
+		return sysError.ErrOrderAlreadyCompleted
+	}
+
 	return storage.DB().Model(&model.Order{}).Where("id = ?", orderID).Update("is_done", true).Error
 }
 

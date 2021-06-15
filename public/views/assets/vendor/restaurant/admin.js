@@ -1,10 +1,12 @@
 
 let myAdmin;
 let nameImage;
+let nameUpdateImage;
 let myRole;
 let roles;
 let establishments;
 let mapProduct = new Map();
+let mapProductUpdate = new Map();
 let myMap = new Map();
 let myEstablishment;
 let total = 0
@@ -12,34 +14,219 @@ let ordersPending = new Map(); //Pendiente a ver si lo utilizare
 let mapOrderTableTable = new Map();
 let mapTableOrder = new Map();
 let mapOrderTable = new Map();
-let modal;
+let payments;
 
-function closeModal(){
-    modal.innerHTML = "";
-    modal.style.display = "none";
+function updatePrice(id){
+    document.getElementById(`p-${id}`).innerHTML = "Precio Total: "
 }
 
-function openModal(funcName, action){
-    modal.innerHTML = `<div class="modal-content">
-        <header class="close" id="modal-close" onclick="closeModal()">&times;</header>
-        <div class="section-title">
-        <h1 style="font-weight: bold">Confirmar<span style="color: #ffb03b"> ${action}</span></h1>
-        <p>¿Estás seguro de continuar?</p>
-        </div>
-        <div>
-        <button type="button" onclick="closeModal()" class="cancelbtn">Cancelar</button>
-        <button type="button" onclick="${funcName}()" class="deletebtn">Confirmar</button>
-        </div>
-    </div>`
-    modal.style.display = "block";
+function showCrudPayments(){
+    let temp = ``;
+    payments.forEach(data => {temp += `<option id="op-pay-${data.id}" value="${data.id}">${data.name}</option>`;
+});
+    document.getElementById("crud-payment").innerHTML = `<div class="container">
+    <div class="section-title">
+    <h2>Crear / Actualizar <span>Metodos de pago</span></h2>
+    <p>Formulario para crear o modificar metodos de pago</p>
+    </div>
+    </div>
+    <div class="container book-a-table">
+    <form class="php-email-form" action="">
+    <div class="form-row">
+    <div class="col-md-6 form-group">
+        <input type="text" name="pay-form" class="form-control" id="pay-name" placeholder="Nombre">
+    </div>
+    <div class="col-md-6 form-group">
+        <select name="pay-form" id="pay-select" required=""><option value="0" selected="">Nuevo</option>${temp}</select>
+    </div>
+    <div class="text-center"><button id="pay-button" type="button" onclick="openModal('crudPayment', 'Proceso')">Enviar</button></div>
+
+    </div></form></div>`;
 }
 
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
+function crudPayment(){
+    let name = document.getElementById("pay-name").value;
+    let id = parseInt(document.getElementById("pay-select").value);
+    let url;
+    let method;
+    if (name == null){
+        return "Nombre vacio...";
     }
+    if (id == 0){
+        url = `http://localhost:80/api/v1/pay/`;
+        method = `POST`;
+    }else if (id > 0){
+        url = `http://localhost:80/api/v1/pay/${id}`;
+        method = `PUT`;
+    }else{
+        return "ID no valida...";
+    }
+    fetch(url, {
+        method:method,
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({name:name})
+    }).then(res => {
+        if (res.status == 201){
+            res.json().then(obj => document.getElementById("pay-select").innerHTML += `<option value="${obj.id}">${name}</option>`);
+            showSuccessful();
+        }else if (res.ok){
+            document.getElementById(`op-pay-${id}`).innerHTML = name;
+            showSuccessful();
+        }else {
+            res.json().then(x => showError(translateError(x.message)));
+        }
+        document.getElementById("pay-name").value = "";
+        document.getElementById("pay-select").value = "0";
+    });
 }
 
+function fetchPayments(){
+    fetch(`http://localhost:80/api/v1/pay/`).then(res => {
+        if (res.ok) {
+            res.json().then(data => {payments = data; 
+                showCrudPayments();
+            });
+        }
+    })
+}
+
+function timeToString(t){
+    time = t
+    let year = time.slice(0,4)
+    let month = time.slice(5,7)
+    let day = time.slice(8, 10)
+    let hour = time.slice(11,13)
+    let minute = time.slice(14,16)
+    return `${day}/${month}/${year} ${hour}:${minute}`;
+}
+
+function getShowOrderPendingByEstablishment(op){
+    let order; 
+    let orderProduct = ``
+    //addOrderToPending(op);
+    total=0;
+    let button = "";
+    let tableID = mapOrderTableTable.get(op.order.table_id);
+    console.log("ORDENES: ",op);
+    if(!mapOrders.has(op.order.id)){
+        mapOrders.set(op.order.id, op);
+    }
+    //ordersPending.set(op.order, op) // agrega al map de ordenes pendientes
+    mapTableOrder.set(tableID, op.order.id)
+    mapOrderTable.set(op.order.id, tableID)
+    op.order.products.forEach(val => {
+        if(!mapProductUpdate.has(val.id)){
+            mapProductUpdate.set(val.id, val)
+        }
+    })
+    op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    if(op.order.table_id == null){
+        button = `<button type="button" onclick="openModalParam('completeOrderRemote', 'Pedido', ${op.order.id})">Completar pedido</button>`;
+    }
+    order = `<div class="col-lg-3" id="order-pending-e-${op.order.id}">
+    <div class="box">
+    <div id="box-pending-e-${op.order.id}">
+        <h4>Encabezado</h4>
+        <p>Fecha: ${timeToString(op.order.created_at)}</p>
+        <p>Precio Total: ${total.toFixed(2)}</p>
+        <h4>Productos</h4>`;
+    order += orderProduct;
+    order += `</div><div class="text-center">${button}</div></div></div>`;
+    return order;
+}
+
+
+function getAllOrdersPendingByEstablishment(){
+    fetch(`http://localhost:80/api/v1/order/establishment/`).then(res => {
+        if (res.ok){ 
+            let temp=`<div class="container">
+                <div class="section-title">
+                    <h2>Pedidos <span>Pendientes</span></h2>
+                    <p>Aqui podras ver todos los pedidos sin completar</p>
+                </div>
+                <div class="row">`;
+            if(res.status == 204){
+                temp +=`</div></div>`
+                document.getElementById("order-pending-e").innerHTML = temp;
+            }else{
+                res.json().then(data => {
+                if(data != null){
+                    data.forEach(val => {
+                        temp += getShowOrderPendingByEstablishment(val);
+                    })
+                    temp +=`</div></div>`;
+                    document.getElementById("order-pending-e").innerHTML = temp;
+                }
+                
+            })
+            }
+            
+        }else{
+        }
+        document.getElementById("nav-order-pending").innerHTML = `<a href="#order-pending-e">Pedidos Pendientes</a>`
+    })
+}
+
+function getShowOrder(op){
+    let order; 
+    let orderProduct = ``
+    //addOrderToPending(op);
+    total=0;
+    let tempPay = ``;
+    let tableID = mapOrderTableTable.get(op.order.table_id);
+    console.log(op);
+    if(!mapOrders.has(op.order.id)){
+        mapOrders.set(op.order.id, op);
+    }
+    //ordersPending.set(op.order, op) // agrega al map de ordenes pendientes
+    mapTableOrder.set(tableID, op.order.id)
+    mapOrderTable.set(op.order.id, tableID)
+    op.order.products.forEach(val => {
+        if(!mapProductUpdate.has(val.id)){
+            mapProductUpdate.set(val.id, val)
+        }
+    })
+    op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    if(op.order.pay_id != null && op.order.pay_id != 0){
+        tempPay = `<p>Tipo de pago: ${mapPayments.get(op.order.pay_id)}</p>`;
+    }
+    order = `<div class="col-lg-3" id="order-pending-e-${op.order.id}" onclick="printPDF(${op.order.id})">
+    <div class="box">
+    <div id="box-pending-e-${op.order.id}">
+        <h4>Encabezado</h4>
+        <p>Fecha: ${timeToString(op.order.created_at)}</p>
+        ${tempPay}
+        <p>Precio Total: ${total.toFixed(2)}</p>
+        <h4>Productos</h4>`
+    order += orderProduct
+    order += `</div></div></div>`;
+    return order;
+}
+
+function getAllOrdersByEstablishment(){
+    fetch(`http://localhost:80/api/v1/order/establishment/all`).then(res => {
+    if (res.ok){
+        res.json().then(data => {
+            console.log(data)
+            let temp=`<div class="container">
+            <div class="section-title">
+                <h2>Pedidos <span></span></h2>
+                <p>Aqui podras ver todos los pedidos</p>
+            </div>
+            <div class="row">`;
+            if(data != null){
+                data.forEach(val => {
+                    temp += getShowOrder(val);
+                })
+            }
+            temp +=`</div></div>`
+            document.getElementById("orders-by-stablishment").innerHTML = temp;
+            document.getElementById("nav-order-st").innerHTML = `<a href="#orders-by-stablishment">Pedidos</a>`
+        })
+    }else{
+    }
+    })
+}
 
 const PERMISSIONS = {
     WhitOutRestriction:1,
@@ -57,46 +244,84 @@ function deleteElementByID(id){
 }
 
 function addOrderToPending(o) {
+    console.log(o);
     document.getElementById("row-order").innerHTML += loadOrder(o, 0);
 }
 
 function addOrderProductToOrder(tableID, products) {
     let orderProduct = ""
+    total = 0;
     products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    total += parseInt(document.getElementById(`i-p-${tableID}`).value);
+    document.getElementById(`i-p-${tableID}`).value = total;
+    document.getElementById(`p-${tableID}`).innerHTML = `Precio Total: ${total}`;
     document.getElementById(`box-pending-${tableID}`).innerHTML += orderProduct;
 }
 
 function addProductsToOrder(tableID, products){
-    console.log(tableID)
+    if (!mapTableOrder.has(tableID)){return `La mesa no esta en uso`;}
     let orderID = mapTableOrder.get(tableID)
     fetch(`http://localhost:80/api/v1/order/${orderID}`, {
-        method:"POST",
+        method:"PUT",
         headers:{'Content-Type': 'application/json'},
         body:JSON.stringify(products)
     }).then(res => {
+        document.getElementById("shopping-cart").innerHTML = "";
+        myMap.clear();
+        document.getElementById("select-table").value = "";
         if (res.ok){
-            addOrderProductToOrder(tableID, products)
+            showSuccessful();
+            addOrderProductToOrder(tableID, products);
+        }else{
+            res.json(x => showError(translateError(x.message)));
         }
     })
 }
 
 function loadOrderProduct(product) {
-    total += product.amount*mapProduct.get(product.product_id).price
-    return `<h5>${mapProduct.get(product.product_id).name}</h5>
-    <p>Precio unitatio - ${mapProduct.get(product.product_id).price.toFixed(2)}</p>
-    <p>Cantidad - ${product.amount}</p>
-    <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price.toFixed(2)}</p>`
+    if(mapProduct.has(product.product_id)){
+        total += product.amount*mapProduct.get(product.product_id).price
+        return `<h5>${mapProduct.get(product.product_id).name}</h5>
+        <p>Precio unitatio - ${mapProduct.get(product.product_id).price}</p>
+        <p>Cantidad - ${product.amount}</p>
+        <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price}</p>`
+    }else{
+        total += product.amount*mapProductUpdate.get(product.product_id).price
+        return `<h5>${mapProductUpdate.get(product.product_id).name}</h5>
+        <p>Precio unitatio - ${mapProductUpdate.get(product.product_id).price}</p>
+        <p>Cantidad - ${product.amount}</p>
+        <p>Precio total - ${product.amount*mapProductUpdate.get(product.product_id).price}</p>`
+    }
 }
 
-function completeOrder(orderID) {
+function completeOrder(orderID, payID) {
     fetch(`http://localhost:80/api/v1/order/${orderID}`, {
-        method:"POST",
+        body:JSON.stringify({"pay_id":payID}),
+        method:"PATCH",
         headers:{'Content-Type': 'application/json'},
     }).then(res => {
         if (res.ok){
             deleteElementByID(`order-pending-${orderID}`);
-            mapTableOrder.delete(mapOrderTable.get(orderID))
-            mapOrderTable.delete(orderID)
+            mapTableOrder.delete(mapOrderTable.get(orderID));
+            mapOrderTable.delete(orderID);
+            showSuccessful();
+        }else{
+            res.obj().then(x => showError(translateError(x.message)));
+        }})
+}
+
+function completeOrderRemote(orderID) {
+    fetch(`http://localhost:80/api/v1/order/remote/${orderID}`, {
+        method:"PATCH",
+        headers:{'Content-Type': 'application/json'},
+    }).then(res => {
+        if (res.ok){
+            deleteElementByID(`order-pending-e-${orderID}`);
+            mapTableOrder.delete(mapOrderTable.get(orderID));
+            mapOrderTable.delete(orderID);
+            showSuccessful();
+        }else{
+            res.obj().then(x => showError(translateError(x.message)));
         }})
 }
 
@@ -109,24 +334,33 @@ function loadOrder(op, i) {                             //
     //ordersPending.set(op.order, op) // agrega al map de ordenes pendientes
     mapTableOrder.set(tableID, op.order.id)
     mapOrderTable.set(op.order.id, tableID)
+    if(op.order.products != null){
+        op.order.products.forEach(val => {
+        if(!mapProductUpdate.has(val.id)){
+            mapProductUpdate.set(val.id, val)
+        }
+        })
+    }
+        
     op.order_products.forEach(val => {orderProduct += loadOrderProduct(val)});
+    
     order = `<div class="col-lg-3" id="order-pending-${op.order.id}">
     <div class="box">
     <div id="box-pending-${tableID}">
+        <input id="i-p-${tableID}" hidden value="${total}"></input>
         <span>Mesa: ${tableID}</span>
         <h4>Encabezado</h4>
-        <p>Fecha: ${op.order.created_at}</p>
-        <p>Precio Total: ${total.toFixed(2)}</p>
+        <p>Fecha: ${timeToString(op.order.created_at)}</p>
+        <p id="p-${tableID}">Precio Total: ${total.toFixed(2)}</p>
         <h4>Productos</h4>`
     order += orderProduct
-    order += `</div><div class="text-center"><button type="button" onclick="completeOrder(${op.order.id})">Completar pedido</button></div></div></div>`;
+    order += `</div><div class="text-center"><button type="button" onclick="openModalParamInput('completeOrder','Pedido',${op.order.id})">Completar pedido</button></div></div></div>`;
     return order;
 }
 
 function loadOrderSection(o) {
     let temp = 
     `<div class="container">
-
     <div class="section-title">
         <h2>Mis Pedidos <span>Pendientes</span></h2>
         <p>Aqui podras ver todos los pedidos sin completar que has realizado</p>
@@ -137,6 +371,7 @@ function loadOrderSection(o) {
     }
     temp += `</div></div>`;
     document.getElementById("my-incomplete-orders").innerHTML=temp
+    document.getElementById("nav-my-order-pending").innerHTML = `<a href="#my-incomplete-orders">Pedidos Pendientes</a>`
 }
 
 
@@ -153,8 +388,9 @@ function updateTotal(amount, price, id, item, key) {
 
 function showSelectEstablishments() {
     let temp = `<option value="" selected disabled hidden>Selecciona un establecimiento</option>`;
+    temp += `<option value="0">Sin establecimiento</option>`;
     establishments.forEach(a => {
-        temp += `<option value="${a.id}" >${a.id}</option>`;
+        temp += `<option value="${a.id}" >${a.id} / ${a.address.city}/ ${a.address.line1}/ ${a.address.postal_code}</option>`;
     });
     document.getElementById("hire-select-establishment").innerHTML = temp;
     temp += `<option value="0" selected >Nuevo Establecimiento</option>`
@@ -206,7 +442,6 @@ function getMyRolePermissions(){
 }
 
 function getAllRoles(per){
-    console.log(roles)
     if (roles == null){
         fetch(`http://localhost:80/api/v1/rol/`,{method:"GET"}).then(res => res.json().then(data => {
         roles = data;
@@ -267,21 +502,39 @@ function hireUser(){
     let rol_id = parseInt(document.getElementById("hire-select-rol").value);
     let establishment_id = parseInt(document.getElementById("hire-select-establishment").value);
     let email = document.getElementById("hire-input-email").value;
+    let body;
+    if (document.getElementById("hire-select-rol").value == "" ||document.getElementById("hire-select-establishment").value == "" || email=="" ){
+        return `Necesitas llenar el formulario`;
+    }
+    if (document.getElementById("hire-select-establishment").value == "0"){
+        body = {"rol_id":rol_id};
+    }else{
+        rol_id = parseInt(document.getElementById("hire-select-establishment").value);
+        body = {
+            "rol_id":rol_id,
+            "establishment_id":establishment_id,
+        }
+    }
     fetch(`http://localhost:80/api/v1/admin/hire/${email}`,{
         method:"PATCH",
         headers:{
             'Content-Type': 'application/json'
         },
-        body:JSON.stringify({
-            "rol_id":rol_id,
-            "establishment_id":establishment_id,
-        })
-    })
+        body:JSON.stringify(body)
+    }).then(res => {
+        if (!res.ok){
+            res.json().then(x => err = window.alert(translateError(x.message)))
+        }else{
+            document.getElementsByName("hire-form").forEach(x => x.value="");
+            showSuccessful();
+        }
+    });
 }
 
 function hireUserInStablishment(){
     let rol_id = parseInt(document.getElementById("hire-select-rol-st").value);
     let email = document.getElementById("hire-input-email-st").value;
+    if(email == "" || document.getElementById("hire-select-rol-st").value == ""){return "Necesitas llenar el formulario";}
     fetch(`http://localhost:80/api/v1/user/hire/${email}`,{
         method:"PATCH",
         headers:{
@@ -290,12 +543,18 @@ function hireUserInStablishment(){
         body:JSON.stringify({
             "rol_id":rol_id
         })
-    })
+    }).then(res => showResultFunction(res));
 }
 
 
 function crudEstablishment(){
     let address = document.getElementsByName("form-crud-establishment")
+    let err=``;
+    let amountTables = address.item(6).value;
+    let st = address.item(7).value;
+    if (amountTables < 1){return `Agrega al menos una mesa`}
+    address.forEach(val => {if(val.value == ""){err = "Necesitas completar el formulario"}});
+    if (err != ""){return err}
     let dataAddress = {
         "line1":address.item(0).value,
         "line2":address.item(1).value,
@@ -304,10 +563,7 @@ function crudEstablishment(){
         "country":address.item(4).value,
         "postal_code":address.item(5).value
     };
-    let amountTables = address.item(6).value;
-    let st = address.item(7).value;
     let myInit = {method:"POST",headers:{'Content-Type': 'application/json'}};
-    let myRequest;
     let addressInit={
         method:"",
         body:JSON.stringify(dataAddress),
@@ -316,13 +572,14 @@ function crudEstablishment(){
     if (st == "0"){
         addressInit.method = "POST";
         fetch("http://localhost:80/api/v1/address/", addressInit).then(res => res.json().then(data =>{
-            console.log(data);
             myInit.body = JSON.stringify({address_id:data});
-            fetch(`http://localhost:80/api/v1/establishment/${amountTables}`, myInit).then(res => console.log(res));
+            fetch(`http://localhost:80/api/v1/establishment/${amountTables}`, myInit).then(res => {
+                if(res.ok){showSuccessful()}else{res.json(x=>showError(translateError(x.message)))}
+            });
         }))
     }else{
         addressInit.method = "PUT";
-        fecht(`http://localhost:80/api/v1/address/${st}`, addressInit).then(res => console.log(res));
+        fecht(`http://localhost:80/api/v1/establishment/${st}`, addressInit).then(res => showResultFunction(res));
     }
 }
 
@@ -355,14 +612,21 @@ function addProduct(key, amount, src, name, price, description) {
         document.getElementById(`input-product-${keyMap}`).value=val
     })
     }
-    
 }
 
-function loadMenuProduct(data) {
+function addAdminProduct(key, amount, src, name, price, description) {
+    document.getElementById("input-name-u").value = name;
+    document.getElementById("input-price-u").value = price;
+    document.getElementById("img-u").src = src;
+    document.getElementById("input-description-u").value = description;
+    document.getElementById("hidden-u").value = key
+}
+
+function loadMenuProduct(data, funcName) {
     var temp = 
     `<div class="col-lg-6 menu-item">
     <div class="menu-content">
-    <button name="button-menu" onclick="addProduct(${data.id}, 1, '${data.img}', '${data.name}', ${data.price}, '${data.description}')">${data.name}</button><span>$${data.price}</span>
+    <button name="button-menu" onclick="${funcName}(${data.id}, 1, '${data.img}', '${data.name}', ${data.price}, '${data.description}')">${data.name}</button><span>$${data.price}</span>
     </div>
     <div class="menu-ingredients">${data.description}</div>
     </div>`;
@@ -376,21 +640,27 @@ function loadMenuProduct(data) {
 
 function fireUser(){
     let email = document.getElementById("fire-input-email").value;
+    if(email == ""){
+        return "Necesitas llenar el formulario";
+    }
     fetch(`http://localhost:80/api/v1/admin/fire/${email}`,{
         method:"PATCH",
-    })
+    }).then(res => showResultFunction(res));
 }
 
 function fireUserInStablishment(){
     let email = document.getElementById("fire-input-email-st").value;
+    if(email == ""){
+        return "Necesitas llenar el formulario";
+    }
     fetch(`http://localhost:80/api/v1/user/fire/${email}`,{
         method:"PATCH",
-    })
+    }).then(res => showResultFunction(res));
 }
 
 function menuEmployee(data){
     let temp = "";
-    data.forEach(item => temp+=loadMenuProduct(item)); 
+    data.forEach(item => temp+=loadMenuProduct(item, 'addProduct')); 
     document.getElementById("menu").innerHTML=`<div class="container">
     <div class="section-title">
         <h2>Revisa nuestro sabroso <span>Menú</span></h2>
@@ -404,7 +674,7 @@ function menuEmployee(data){
 
 function menuAdmin(data){
     let temp = "";
-    data.forEach(item => temp+=loadMenuProduct(item)); 
+    data.forEach(item => temp+=loadMenuProduct(item, 'addAdminProduct')); 
     document.getElementById("menu").innerHTML=`<div class="container">
     <div class="section-title">
         <h2>Revisa nuestro sabroso <span>Menú</span></h2>
@@ -417,17 +687,11 @@ function menuAdmin(data){
 
 function showMenu(){
     fetch(`http://localhost:80/api/v1/product/`).then(res => res.json().then(data => {
-        let temp = "";
-        data.forEach(item => temp+=loadMenuProduct(item)); 
-        document.getElementById("menu").innerHTML=`<div class="container">
-        <div class="section-title">
-            <h2>Revisa nuestro sabroso <span>Menú</span></h2>
-        </div>
-        <div class="row menu-container" id="menu-container">
-        ${temp}
-        </div>
-
-        </div>`;
+        if(myAdmin.rol_id <= 2){
+            menuAdmin(data)
+        }else{
+            menuEmployee(data)
+        }
         //document.getElementById("menu-container").innerHTML = temp;
     }))
 }
@@ -471,6 +735,10 @@ function makeOrderInEstablishment(){
         };
         products.push(p);
     });
+    if(products.length < 1){
+        return `Selecciona al menos un producto`;
+    }
+    if(document.getElementById("select-table").value == ""){return `Selecciona una mesa`;}
     //console.log(t);
     if(mapTableOrder.has(mapOrderTableTable.get(t))){
         addProductsToOrder(mapOrderTableTable.get(t), products)
@@ -489,14 +757,23 @@ function makeOrderInEstablishment(){
             headers:{
                 'Content-Type': 'application/json'
             }}).then(res => {
-                document.getElementById("shopping-cart").innerHTML = ""
-                myMap.clear()
-                document.getElementById("select-table").value = ""
-                res.json().then(data => addOrderToPending(data))})// Limpiar formulario, agregar a ordenes pendientes
+                document.getElementById("shopping-cart").innerHTML = "";
+                myMap.clear();
+                document.getElementById("select-table").value = "";
+                if (res.ok){
+                    res.json().then(data => addOrderToPending(data));
+                    showSuccessful();
+                }else{
+                    res.json().then(data => showError(translateError(data.message)));
+                }
+                })
+                
+                // Limpiar formulario, agregar a ordenes pendientes
     }
     }
 
 function showMyOrder(){
+    document.getElementById("nav-my-order").innerHTML = `<a href="#my-order">Mi pedido</a>`
     document.getElementById("my-order").innerHTML = `<div class="container-fluid">
     <div class="section-title">
         <h2>Nuevo <span>Pedido</span></h2>
@@ -529,6 +806,7 @@ function showHireFireUser(){
 }
 
 function showCRUDEstablishment(){
+    document.getElementById("nav-create-establishment").innerHTML = `<a href="#create-establishment">Crear Establecimiento</a>`
     document.getElementById("create-establishment").innerHTML = `<div class="container">
     <div class="section-title">
     <h2>Registrar <span>Establecimiento</span></h2>
@@ -568,7 +846,10 @@ function showCRUDEstablishment(){
     </div>`
 }
 
+
+
 function showFireUser(){
+    document.getElementById("nav-fire").innerHTML = `<a href="#fire-employee">Despedir</a>`
     document.getElementById("fire-employee").innerHTML= `<div class="container">
         <div class="section-title">
         <h2>Despedir <span>Empleado</span></h2>
@@ -587,6 +868,7 @@ function showFireUser(){
 }
 
 function showFireUserInStablishment(){
+    document.getElementById("nav-fire-st").innerHTML = `<a href="#fire-employee-st">Despedir</a>`
     document.getElementById("fire-employee-st").innerHTML= `<div class="container">
         <div class="section-title">
         <h2>Despedir <span>Empleado</span></h2>
@@ -605,6 +887,7 @@ function showFireUserInStablishment(){
 }
 
 function showHireUserInStablishment(){
+    document.getElementById("nav-hire-st").innerHTML = `<a href="#hire-employee-st">Contratar</a>`
     document.getElementById("hire-employee-st").innerHTML= `<div class="container">
         <div class="section-title">
         <h2>Contratar <span>Empleado</span></h2>
@@ -628,6 +911,7 @@ function showHireUserInStablishment(){
 }
 
 function showHireUser(){
+    document.getElementById("nav-hire").innerHTML = `<a href="#hire-employee">Contratar</a>`
     document.getElementById("hire-employee").innerHTML= `<div class="container">
         <div class="section-title">
         <h2>Contratar <span>Empleado</span></h2>
@@ -656,13 +940,60 @@ function showHireUser(){
 
 }
 
+function deleteProduct() {
+    let id = parseInt(document.getElementById("hidden-u").value);
+    let err = ``;
+    if (document.getElementById("hidden-u").value == "" || id < 1){
+        return `Selecciona un producto a eliminar`;
+    }
+    fetch(`http://localhost:80/api/v1/product/${id}`,{
+        method: "DELETE"
+    }).then(res => {
+        showResultFunction(res);
+        $('#form-set-image').trigger("reset");
+        document.getElementById("img-u").src =``;
+        });
+}
+
+function updateProduct() {
+    let name = document.getElementById("input-name-u").value;
+    let price = parseFloat(document.getElementById("input-price-u").value);
+    let description = document.getElementById("input-description-u").value;
+    var file = document.getElementById("input-file-u").files[0];
+    let id = parseInt(document.getElementById("hidden-u").value);
+    console.log(id == NaN);
+    if (document.getElementById("hidden-u").value == "" || id < 1){return `Selecciona un producto a actualizar`;}
+    if (name == "" || document.getElementById("input-price-u").value == "" || description == "" || file == undefined){
+        return `Necesitas llenar el formulario`;
+    }
+    fetch(`http://localhost:80/api/v1/product/${id}`,{
+        method: "PUT",
+        body: JSON.stringify({
+            "name":name,
+            "price":price,
+            "description":description,
+            "img":`assets/img/products/${name}.jpg`
+        }),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    }).then(res => {
+        if (res.ok){
+            sendFormSetImageU();
+        }
+        showResultFunction(res);
+        $('#form-set-image').trigger("reset");
+        document.getElementById("img-u").src =``;
+        });
+}
+
 function createProduct() {
     let name = document.getElementById("input-name").value;
     let price = parseFloat(document.getElementById("input-price").value);
     let description = document.getElementById("input-description").value;
     var file = document.getElementById("input-file").files[0];
-    if (name == null || price == null || description == null || file == null){
-        return false
+    if (name == "" || document.getElementById("input-price").value == "" || description == "" || file == undefined){
+        return `Necesitas completar el formulario`;
     }
     fetch("http://localhost:80/api/v1/product/",{
         method: "POST",
@@ -678,12 +1009,10 @@ function createProduct() {
     }).then(res => {
         if (res.ok){
             sendFormSetImage();
-            
-        }else{
-                console.log(res.status);
-            }
+        }
+        showResultFunction(res)
         $('#form-set-image').trigger("reset");
-        document.getElementById("img") =`<img id="img" class="img-fluid">`
+        document.getElementById("img").src =``;
         });
 }
 
@@ -702,16 +1031,23 @@ async function isLogin (){
 function updateNameImage(){
     nameImage = document.getElementById("input-name").value
     document.getElementById("submit-product").formAction = `http://localhost:80/api/v1/product/img/${nameImage}`
-    console.log(nameImage)
 }
-
-
 
 function sendFormSetImage(){
     nameImage = document.getElementById("input-name").value;
     document.getElementById("form-set-image").action = `http://localhost:80/api/v1/product/img/${nameImage}`;
     document.getElementById("form-set-image").submit();
-    
+}
+
+function updateNameImageU(){
+    nameUpdateImage = document.getElementById("input-name-u").value
+    document.getElementById("submit-product-u").formAction = `http://localhost:80/api/v1/product/img/${nameUpdateImage}`
+}
+
+function sendFormSetImageU(){
+    nameUpdateImage = document.getElementById("input-name-u").value;
+    document.getElementById("form-set-image-u").action = `http://localhost:80/api/v1/product/img/${nameUpdateImage}`;
+    document.getElementById("form-set-image-u").submit();
 }
 
 $('#form-set-image').submit(function () {
@@ -724,7 +1060,59 @@ $('#form-set-image').submit(function () {
     return false;
 });
 
+$('#form-set-image-u').submit(function () {
+    $.ajax({
+        type: $('#form-set-image-u').attr('method'), 
+        url: `"http://localhost:80/api/v1/product/img/${nameUpdateImage}"`,
+        data: $('#form-set-image-u').serialize(),
+        success: function (data) { console.log("Enviado") }  
+    });
+    return false;
+});
+
+function showUpdateProduct(){
+    document.getElementById("nav-update-product").innerHTML = `<a href="#update-product">Actualizar Producto</a>`
+    document.getElementById("update-product").innerHTML=`<div class="container">
+        <div class="section-title">
+        <h2>Actualizar <span>Productos</span></h2>
+        <p>Actualizacion/Eliminacion de productos</p>
+    </div>
+    </div>
+    <div class="container book-a-table">
+    <form class="php-email-form" method="post" enctype="multipart/form-data" id="form-set-image-u" target="request">
+        <div class="form-row" >
+        <div class="col-md-6 form-group" id="div-input-name">
+            <input type="text" name="name" class="form-control" id="input-name-u" oninput="updateNameImageU()" placeholder="Nombre del producto">
+        </div>
+        <div class="col-md-6 form-group">
+            <input type="number" class="form-control" name="price" id="input-price-u" placeholder="Precio" >
+        </div>
+        <div class="col-md-6 form-group">
+            <input class="form-control" name="file" type="file" id="input-file-u" accept="image/*" onchange="mostrarU()" >
+        </div>
+        <input type="hidden" id="hidden-u">
+        <div class="gallery-item">
+            <img id="img-u" class="img-fluid">
+        </div>
+        </div>
+        <div class="form-group">
+        <textarea id="input-description-u" class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Descripción"></textarea>
+        </div>
+        <div class="text-center">
+            <button type="button" onclick="openModal('updateProduct', 'Actualizar Producto')">Actualizar</button>
+            <button type="button" onclick="openModal('deleteProduct', 'Eliminar Producto')">Eliminar</button>
+        </div>
+        
+    </form>
+    </div>
+    
+    <iframe name="request" width="0" height="0" frameborder="0" id="request-u" style="display: none;"></iframe>`
+    
+}
+
+
 function showCreateProduct(){
+    document.getElementById("nav-new-product").innerHTML=`<a href="#create-product">Crear Producto</a>`
     document.getElementById("create-product").innerHTML=`<div class="container">
         <div class="section-title">
         <h2>Registrar <span>Productos</span></h2>
@@ -760,7 +1148,9 @@ function showCreateProduct(){
 
 function showAll(){
     showCreateProduct();
+    showUpdateProduct();
     getAllRoles(2);
+    fetchPayments();
     //showMyOrder();
 }
 
@@ -772,13 +1162,12 @@ function showFunctionByPermission(id){
     console.log(id)
     switch (id) {
         case 2:
-            showCreateEstablishment();
+            showCRUDEstablishment();
             break
         case 3:
             getAllRoles(2);
             break;
         case 4:
-            
             break;
         case 5:
             loadMyEstablishments();
@@ -786,10 +1175,13 @@ function showFunctionByPermission(id){
         case 6:
             break;
         case 7:
+            getAllOrdersPendingByEstablishment();
             break;
         case 8:
+            fetchPayments();
             break;
         case 9:
+            getAllOrdersByEstablishment();
             break;
         case 10:
             break;
@@ -823,6 +1215,7 @@ function showAllFunctionsByPermissions(){
 }
 
 function loadAdminPage() {
+    loadPayment();
     modal = document.getElementById("myModal");
     isLogin();
 }
@@ -834,6 +1227,17 @@ function mostrar(){
         reader.readAsDataURL(file );
         reader.onloadend = function () {
             document.getElementById("img").src = reader.result;
+        }
+        }
+}
+
+function mostrarU(){
+    var file = document.getElementById("input-file-u").files[0];
+    var reader = new FileReader();
+    if (file) {
+        reader.readAsDataURL(file );
+        reader.onloadend = function () {
+            document.getElementById("img-u").src = reader.result;
         }
         }
 }

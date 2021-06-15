@@ -125,6 +125,24 @@ func CreateOrder(c echo.Context) error {
 
 func CompleteOrder(c echo.Context) error {
 	var err error
+	m := &model.Order{}
+	id, err := strconv.ParseUint(c.Param("id"), 10, 0)
+	if err != nil {
+		return err
+	}
+	err = c.Bind(m)
+	if err != nil {
+		return err
+	}
+	claim, ok := c.Get("claim").(model.Claim)
+	if !ok {
+		return sysError.ErrCannotGetClaim
+	}
+	return controller.CompleteOrder(uint(id), claim.UserID, *m.PayID)
+}
+
+func CompleteOrderRemote(c echo.Context) error {
+	var err error
 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 0)
 	if err != nil {
@@ -134,7 +152,7 @@ func CompleteOrder(c echo.Context) error {
 	if !ok {
 		return sysError.ErrCannotGetClaim
 	}
-	return controller.CompleteOrder(uint(id), claim.UserID)
+	return controller.CompleteOrderRemote(uint(id), claim.UserID)
 }
 
 func AddProductsToOrder(c echo.Context) error {
@@ -143,9 +161,10 @@ func AddProductsToOrder(c echo.Context) error {
 		return err
 	}
 	var m []*model.OrderProduct
-	if err = c.Bind(m); err != nil {
+	if err = c.Bind(&m); err != nil {
 		return err
 	}
+
 	claim, ok := c.Get("claim").(model.Claim)
 	if !ok {
 		return sysError.ErrCannotGetClaim
