@@ -10,6 +10,7 @@ let last=0;
 function fetchEstablishment() {
     fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
         let temp = ``;
+        establishments = obj;
         obj.forEach(val => temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`);
         document.getElementById("select-establishment").innerHTML += temp;
     }))
@@ -362,7 +363,9 @@ function caseNotLogin() {
 function sectionMyOrder() {
     fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
         let temp = ``;
-        obj.forEach(val => temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`);
+        obj.forEach(val => {temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`;
+            mapEstablishments.set(val.id, val);        
+    });
         document.getElementById("gallery").innerHTML = `<div class="container-fluid">
         <div class="section-title">
             <h2>Mi <span>Pedido</span></h2>
@@ -584,4 +587,5 @@ function getAll() {
     modal = document.getElementById("myModal");
     getMenu('http://localhost:80/api/v1/product/', loadMenuProduct);
     switchCaseSession();
+    showNavResponse();
 }

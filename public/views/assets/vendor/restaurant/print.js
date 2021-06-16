@@ -3,6 +3,22 @@ let totalOrder = 0;
 let mapPayments = new Map();
 let modal;
 let selectPayments="";
+let amountNav = 0;
+let establishments;
+let mapEstablishments = new Map();
+
+function showNavResponse(){
+    document.getElementsByClassName("mobile-nav-toggle d-lg-none")[0].addEventListener("click", () => {
+        if(amountNav == 0){
+            var $mobile_nav = $('.nav-menu').clone().prop({
+            class: 'mobile-nav d-lg-none'
+            });
+            $('body').append($mobile_nav);
+            amountNav = 1;
+        }
+    })
+}
+
 function showResultFunction(res){
     if(res.ok){
         showSuccessful();
@@ -188,6 +204,7 @@ function createOrderProduct(product){
 function createInvoice(order){
     let temp = ``;
     let pay = ``;
+    let st = ``;
     totalOrder = 0;
     console.log(order)
     order.order_products.forEach(element => {
@@ -196,10 +213,15 @@ function createInvoice(order){
     if(mapPayments.has(order.order.pay_id)){
         pay = `<br>Tipo de pago: ${mapPayments.get(order.order.pay_id)}`;
     }
+    if(mapEstablishments.has(order.order.establishment_id)){
+        let t = mapEstablishments.get(order.order.establishment_id);
+        st = `<br>Direccion:  ${t.address.city} / ${t.address.state} / ${t.address.country} / ${t.address.line1} / ${t.address.postal_code}`;
+    }
     return `<div class="ticket">
         <p class="centrado">Beer para creer
             <br>${timeToString(order.order.created_at)}
             ${pay}
+            ${st}
         </p>
         <table class="centrado">
             <thead>

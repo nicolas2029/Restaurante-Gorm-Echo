@@ -23,11 +23,11 @@
 	)
 ```
 
-## Password
+## Contraseñas
 
 Las contraseñas deben de contener al menos una mayuscula, una minuscula y un caracter especial, ademas de tener una longitud mayor o igual a 8
 
-## Establishment
+## Permisos
 
 Cada permiso esta identificado por un id y posee una descripcion sobre su funcionamiento
 

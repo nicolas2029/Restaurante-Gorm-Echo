@@ -4,7 +4,6 @@ let nameImage;
 let nameUpdateImage;
 let myRole;
 let roles;
-let establishments;
 let mapProduct = new Map();
 let mapProductUpdate = new Map();
 let myMap = new Map();
@@ -42,6 +41,7 @@ function showCrudPayments(){
     <div class="text-center"><button id="pay-button" type="button" onclick="openModal('crudPayment', 'Proceso')">Enviar</button></div>
 
     </div></form></div>`;
+    document.getElementById("nav-crud-payment").innerHTML = `<a href="#crud-payment">Metodos de pago</a>`
 }
 
 function crudPayment(){
@@ -388,13 +388,15 @@ function updateTotal(amount, price, id, item, key) {
 
 function showSelectEstablishments() {
     let temp = `<option value="" selected disabled hidden>Selecciona un establecimiento</option>`;
+    let temp2 = ``;
     temp += `<option value="0">Sin establecimiento</option>`;
     establishments.forEach(a => {
         temp += `<option value="${a.id}" >${a.id} / ${a.address.city}/ ${a.address.line1}/ ${a.address.postal_code}</option>`;
+        temp2 += `<option value="${a.id}" >${a.id} / ${a.address.city}/ ${a.address.line1}/ ${a.address.postal_code}</option>`;
     });
     document.getElementById("hire-select-establishment").innerHTML = temp;
-    temp += `<option value="0" selected >Nuevo Establecimiento</option>`
-    document.getElementById("crud-select-establishment").innerHTML = temp;
+    temp2 += `<option value="0" selected >Nuevo Establecimiento</option>`
+    document.getElementById("crud-select-establishment").innerHTML = temp2;
 }
 
 /*function SetEstablishments(a) {
@@ -406,7 +408,7 @@ function showSelectEstablishments() {
 function loadAllEstablishments(){
     fetch(`http://localhost:80/api/v1/establishment/`,{method:"GET"}).then(res => res.json().then(data => {
         establishments = data;
-
+        data.forEach(val => mapEstablishments.set(val.id,val));
         showCRUDEstablishment();
         showHireFireAdmin();
     })).catch(a => console.log(a));
@@ -507,6 +509,7 @@ function hireUser(){
         return `Necesitas llenar el formulario`;
     }
     if (document.getElementById("hire-select-establishment").value == "0"){
+        if(rol_id > 2){return `Este role necesita de un establecimiento`};
         body = {"rol_id":rol_id};
     }else{
         rol_id = parseInt(document.getElementById("hire-select-establishment").value);
@@ -1218,6 +1221,7 @@ function loadAdminPage() {
     loadPayment();
     modal = document.getElementById("myModal");
     isLogin();
+    showNavResponse();
 }
 
 function mostrar(){
