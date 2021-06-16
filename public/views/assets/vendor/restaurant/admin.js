@@ -813,7 +813,7 @@ function showCRUDEstablishment(){
     document.getElementById("create-establishment").innerHTML = `<div class="container">
     <div class="section-title">
     <h2>Registrar <span>Establecimiento</span></h2>
-    <p>Agrega un nuevo establecimiento; pendiente por actualizar</p>
+    <p>Agrega un nuevo establecimiento</p>
     </div>
     </div>
     <div class="container book-a-table">
