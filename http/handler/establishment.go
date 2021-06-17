@@ -69,21 +69,20 @@ func UpdateEstablishment(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
-	m, err := controller.GetEstablishment(uint(id))
+	st, err := controller.GetEstablishment(uint(id))
 	if err != nil {
 		return err
 	}
+	m := st.Address
 
 	if err = c.Bind(&m); err != nil {
 		return err
 	}
-
-	err = controller.UpdateEstablishment(&m)
+	err = controller.UpdateAddress(&m)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, m)
+	return c.NoContent(http.StatusOK)
 }
 
 func DeleteEstablishment(c echo.Context) error {

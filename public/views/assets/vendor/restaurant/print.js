@@ -162,6 +162,8 @@ function translateError(key) {
             return `El pedido ya ha sido completado`;
         case `empty address`:
             return `Direccion vacia`;
+        case `product already updated`:
+            return `Producto actualmente actualizado`;
         default:
             return key;
     }

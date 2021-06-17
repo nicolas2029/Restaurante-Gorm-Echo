@@ -5,6 +5,7 @@ import (
 
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
+	"github.com/nicolas2029/Restaurante-Gorm-Echo/sysError"
 )
 
 func GetProduct(id uint) (model.Product, error) {
@@ -26,9 +27,12 @@ func CreateProduct(m *model.Product) error {
 }
 
 func UpdateProduct(m *model.Product) error {
-	err := storage.DB().Model(&model.Product{}).Where("id = ?", m.ID).Update("updated", true).Error
-	if err != nil {
-		return err
+	r := storage.DB().Model(&model.Product{}).Where("id = ? and updated = false", m.ID).Update("updated", true)
+	if r.Error != nil {
+		return r.Error
+	}
+	if r.RowsAffected == 0 {
+		return sysError.ErrProductAlreadyUpdated
 	}
 	m.ID = 0
 	m.CreatedAt = time.Time{}
@@ -38,5 +42,12 @@ func UpdateProduct(m *model.Product) error {
 }
 
 func DeleteProduct(id uint) error {
-	return storage.DB().Model(&model.Product{}).Where("id = ?", id).Update("updated", true).Error
+	r := storage.DB().Model(&model.Product{}).Where("id = ? and updated = false", id).Update("updated", true)
+	if r.Error != nil {
+		return r.Error
+	}
+	if r.RowsAffected == 0 {
+		return sysError.ErrProductAlreadyUpdated
+	}
+	return nil
 }

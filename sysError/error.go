@@ -21,4 +21,5 @@ var (
 	ErrEmptyOrder            = errors.New("empty order")
 	ErrOrderAlreadyCompleted = errors.New("order already completed")
 	ErrEmptyAddress          = errors.New("empty address")
+	ErrProductAlreadyUpdated = errors.New("product already updated")
 )

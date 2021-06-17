@@ -138,6 +138,8 @@ func SwitchResponse(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		case sysError.ErrEmptyAddress:
 			return c.JSON(http.StatusBadRequest, getMapErr(err))
+		case sysError.ErrProductAlreadyUpdated:
+			return c.JSON(http.StatusBadRequest, getMapErr(err))
 		default:
 			return err
 		}

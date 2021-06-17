@@ -118,8 +118,8 @@ async function setMyOrders(data){
 function loadPay(data){
     if(mapPayments.size == 0){
         fetch("http://localhost:80/api/v1/pay/").then(res => {
-            res.json().then(data => {
-                data.forEach(x => mapPayments.set(x.id, x.name));
+            res.json().then(d => {
+                d.forEach(x => mapPayments.set(x.id, x.name));
                 loadOrderSection(data);
             })}
         );

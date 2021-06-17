@@ -49,8 +49,8 @@ function crudPayment(){
     let id = parseInt(document.getElementById("pay-select").value);
     let url;
     let method;
-    if (name == null){
-        return "Nombre vacio...";
+    if (name == ""){
+        return "Necesitas ingresar el nombre del metodo de pago";
     }
     if (id == 0){
         url = `http://localhost:80/api/v1/pay/`;
@@ -67,7 +67,7 @@ function crudPayment(){
         body:JSON.stringify({name:name})
     }).then(res => {
         if (res.status == 201){
-            res.json().then(obj => document.getElementById("pay-select").innerHTML += `<option value="${obj.id}">${name}</option>`);
+            res.json().then(obj => document.getElementById("pay-select").innerHTML += `<option value="${obj.id}" id="op-pay-${obj.id}">${name}</option>`);
             showSuccessful();
         }else if (res.ok){
             document.getElementById(`op-pay-${id}`).innerHTML = name;
@@ -512,7 +512,6 @@ function hireUser(){
         if(rol_id > 2){return `Este role necesita de un establecimiento`};
         body = {"rol_id":rol_id};
     }else{
-        rol_id = parseInt(document.getElementById("hire-select-establishment").value);
         body = {
             "rol_id":rol_id,
             "establishment_id":establishment_id,
@@ -582,7 +581,7 @@ function crudEstablishment(){
         }))
     }else{
         addressInit.method = "PUT";
-        fecht(`http://localhost:80/api/v1/establishment/${st}`, addressInit).then(res => showResultFunction(res));
+        fetch(`http://localhost:80/api/v1/establishment/${st}`, addressInit).then(res => showResultFunction(res));
     }
 }
 
@@ -955,6 +954,11 @@ function deleteProduct() {
         showResultFunction(res);
         $('#form-set-image').trigger("reset");
         document.getElementById("img-u").src =``;
+        document.getElementById("input-name-u").value = "";
+        document.getElementById("input-price-u").value = "";
+        document.getElementById("input-description-u").value="";
+        document.getElementById("hidden-u").value="";
+        document.getElementById("input-file-u").value="";
         });
 }
 
@@ -987,6 +991,11 @@ function updateProduct() {
         showResultFunction(res);
         $('#form-set-image').trigger("reset");
         document.getElementById("img-u").src =``;
+        document.getElementById("input-name-u").value = "";
+        document.getElementById("input-price-u").value = "";
+        document.getElementById("input-description-u").value="";
+        document.getElementById("hidden-u").value="";
+        document.getElementById("input-file-u").value="";
         });
 }
 
@@ -998,6 +1007,7 @@ function createProduct() {
     if (name == "" || document.getElementById("input-price").value == "" || description == "" || file == undefined){
         return `Necesitas completar el formulario`;
     }
+    if(price <= 0){return `El precio tiene que ser mayor a cero`};
     fetch("http://localhost:80/api/v1/product/",{
         method: "POST",
         body: JSON.stringify({
@@ -1171,6 +1181,8 @@ function showFunctionByPermission(id){
             getAllRoles(2);
             break;
         case 4:
+            showCreateProduct();
+            showUpdateProduct();
             break;
         case 5:
             loadMyEstablishments();
