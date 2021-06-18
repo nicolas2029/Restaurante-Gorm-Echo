@@ -84,7 +84,7 @@ function loadOrderSection(o) {
 
     <div class="section-title">
         <h2>Mis <span>Pedidos</span></h2>
-        <p>Aqui podras ver todos los pedidos que has realizado</p>
+        <p>Aquí podras ver todos los pedidos que has realizado</p>
     </div>
     <div class="row" id="row-order">`;
     if(o != null) {
@@ -135,7 +135,7 @@ async function loadPaymentMethod(){
         res.json().then(
         data => {
             if (data.length > 0) {
-                let temp=`<option value="" selected disabled hidden>Selecciona un metodo de pago</option>`;
+                let temp=`<option value="" selected disabled hidden>Selecciona un método de pago</option>`;
                 data.forEach((itemData) => {
                     temp += `<option value=${itemData.id}>${itemData.name}</option>`
                     mapPayments.set(itemData.id, itemData.name)
@@ -326,7 +326,7 @@ function post(url) {
                 response.json().then(data => {sessionStorage.setItem("authorization",data.token);});
                 location.reload();
             }else{
-                showError("Credenciales no validas")
+                showError("Credenciales no válidas")
             }
             
         }).catch(err => console.log(err));
@@ -342,13 +342,13 @@ function caseNotLogin() {
     <form class="php-email-form" action="">
         <div class="form-row">
         <div class="col-lg-4 col-md-6 form-group">
-            <input type="email" class="form-control" name="email" id="email" placeholder="Tu Correo Electrónico" oninput="return validar_email(email.value)" data-rule="email" data-msg="Please enter a valid email">
+            <input type="email" class="form-control" name="email" id="email" placeholder="Tu Correo Electrónico" oninput="return válidar_email(email.value)" data-rule="email" data-msg="Please enter a valid email">
             <span id="email-error">Email no valido</span>
             <div class="validate"></div>
         </div>
         <div class="col-lg-4 col-md-6 form-group">
-            <input type="password" class="form-control" name="password" id="password" placeholder="Ingresa una contraseña" oninput="return validar_clave(password.value)" data-msg="Please enter at least 4 chars">
-            <span id="password-error">Contraseña no valida</span>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Ingresa una contraseña" oninput="return válidar_clave(password.value)" data-msg="Please enter at least 4 chars">
+            <span id="password-error">Contraseña no válida</span>
             <div class="validate"></div>
         </div>
         <div class="text-center"><button  type="button" disabled id="button-singup" onclick="post('http://localhost:80/api/v1/user/')">Registrar</button></div>
@@ -369,7 +369,7 @@ function sectionMyOrder() {
         document.getElementById("gallery").innerHTML = `<div class="container-fluid">
         <div class="section-title">
             <h2>Mi <span>Pedido</span></h2>
-            <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
+            <p>Aquí se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
         </div>
         <div class="container">
             <div id="shopping-cart" class="row no-gutters"></div>
@@ -421,13 +421,13 @@ function htmlSectionAccount(){
     document.getElementById("account").innerHTML = `<div class="container">
     <div class="section-title" action="" method="POST">
         <h2><span>Cuenta de Usuario</span></h2>
-        <p>Aqui podras cambiar tu contraseña y desconectar tu usuario actual</p>
+        <p>Aquí podras cambiar tu contraseña y desconectar tu usuario actual</p>
     </div>
     <form class="php-email-form" action="">
         <div class="form-row">
         <div class="col-lg-4 col-md-6 form-group">
             <input type="password" class="form-control" id="password-change-input" name="password"  placeholder="Ingresa una contraseña" oninput="isChangePasswordValid()">
-            <span id="password-change-error">Contraseña no valida</span>
+            <span id="password-change-error">Contraseña no válida</span>
         </div>
         <div class="text-center"><button id="password-change" type="button" disabled onclick="updateUserEmailAndPassword()">Cambiar contraseña</button></div>
     </form>
@@ -563,12 +563,12 @@ function validar_clave(contrasenna){
 				}
                 a = mayuscula && minuscula && numero && caracter_raro
                 if (!a){
-                    document.getElementById("password-error").innerHTML = "Contraseña no valida";
+                    document.getElementById("password-error").innerHTML = "Contraseña no válida";
                 }else{
                     document.getElementById("password-error").innerHTML = "";
                 }
 			}else{
-                document.getElementById("password-error").innerHTML = "Contraseña no valida";
+                document.getElementById("password-error").innerHTML = "Contraseña no válida";
             }
             isValid()
 }

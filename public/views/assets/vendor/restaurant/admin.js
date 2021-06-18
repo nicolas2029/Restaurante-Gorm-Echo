@@ -25,8 +25,8 @@ function showCrudPayments(){
 });
     document.getElementById("crud-payment").innerHTML = `<div class="container">
     <div class="section-title">
-    <h2>Crear / Actualizar <span>Metodos de pago</span></h2>
-    <p>Formulario para crear o modificar metodos de pago</p>
+    <h2>Crear / Actualizar <span>métodos de pago</span></h2>
+    <p>Formulario para crear o modificar métodos de pago</p>
     </div>
     </div>
     <div class="container book-a-table">
@@ -41,7 +41,7 @@ function showCrudPayments(){
     <div class="text-center"><button id="pay-button" type="button" onclick="openModal('crudPayment', 'Proceso')">Enviar</button></div>
 
     </div></form></div>`;
-    document.getElementById("nav-crud-payment").innerHTML = `<a href="#crud-payment">Metodos de pago</a>`
+    document.getElementById("nav-crud-payment").innerHTML = `<a href="#crud-payment">métodos de pago</a>`
 }
 
 function crudPayment(){
@@ -50,7 +50,7 @@ function crudPayment(){
     let url;
     let method;
     if (name == ""){
-        return "Necesitas ingresar el nombre del metodo de pago";
+        return "Necesitas ingresar el nombre del método de pago";
     }
     if (id == 0){
         url = `http://localhost:80/api/v1/pay/`;
@@ -59,7 +59,7 @@ function crudPayment(){
         url = `http://localhost:80/api/v1/pay/${id}`;
         method = `PUT`;
     }else{
-        return "ID no valida...";
+        return "ID no válida...";
     }
     fetch(url, {
         method:method,
@@ -142,7 +142,7 @@ function getAllOrdersPendingByEstablishment(){
             let temp=`<div class="container">
                 <div class="section-title">
                     <h2>Pedidos <span>Pendientes</span></h2>
-                    <p>Aqui podras ver todos los pedidos sin completar</p>
+                    <p>Aquí podras ver todos los pedidos sin completar</p>
                 </div>
                 <div class="row">`;
             if(res.status == 204){
@@ -211,7 +211,7 @@ function getAllOrdersByEstablishment(){
             let temp=`<div class="container">
             <div class="section-title">
                 <h2>Pedidos <span></span></h2>
-                <p>Aqui podras ver todos los pedidos</p>
+                <p>Aquí podras ver todos los pedidos</p>
             </div>
             <div class="row">`;
             if(data != null){
@@ -363,7 +363,7 @@ function loadOrderSection(o) {
     `<div class="container">
     <div class="section-title">
         <h2>Mis Pedidos <span>Pendientes</span></h2>
-        <p>Aqui podras ver todos los pedidos sin completar que has realizado</p>
+        <p>Aquí podras ver todos los pedidos sin completar que has realizado</p>
     </div>
     <div class="row" id="row-order">`;
     if (o != null){
@@ -779,7 +779,7 @@ function showMyOrder(){
     document.getElementById("my-order").innerHTML = `<div class="container-fluid">
     <div class="section-title">
         <h2>Nuevo <span>Pedido</span></h2>
-        <p>Aqui se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
+        <p>Aquí se listaran todos los productos seleccionados para proceder con su respectivo pedido</p>
     </div>
     <div class="container">
         <div id="shopping-cart" class="row no-gutters"></div>
@@ -811,8 +811,8 @@ function showCRUDEstablishment(){
     document.getElementById("nav-create-establishment").innerHTML = `<a href="#create-establishment">Crear Establecimiento</a>`
     document.getElementById("create-establishment").innerHTML = `<div class="container">
     <div class="section-title">
-    <h2>Registrar <span>Establecimiento</span></h2>
-    <p>Agrega un nuevo establecimiento</p>
+    <h2>Registrar/Actualizar <span>Establecimiento</span></h2>
+    <p>Agrega/Actualiza un establecimiento</p>
     </div>
     </div>
     <div class="container book-a-table">
@@ -1088,7 +1088,7 @@ function showUpdateProduct(){
     document.getElementById("update-product").innerHTML=`<div class="container">
         <div class="section-title">
         <h2>Actualizar <span>Productos</span></h2>
-        <p>Actualizacion/Eliminacion de productos</p>
+        <p>Actualización/Eliminación de productos</p>
     </div>
     </div>
     <div class="container book-a-table">

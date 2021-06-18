@@ -63,7 +63,7 @@ function closeAndExecuteParam(func, param){
 function closeAndExecuteParamInput(func, param){
     let id = document.getElementById("modal-select").value;
     if(id == ""){
-        showError("Selecciona un metodo de pago");
+        showError("Selecciona un método de pago");
         return
     }
     closeModal();
@@ -80,7 +80,7 @@ function openModalParamInput(funcName, action, param){
         <header class="close" id="modal-close" onclick="closeModal()">&times;</header>
         <div class="section-title">
         <h1 style="font-weight: bold">Confirmar<span style="color: #ffb03b"> ${action}</span></h1>
-        <select id="modal-select"><option value="" selected="" disabled="" hidden="">Selecciona un metodo de pago</option>${selectPayments}</select>
+        <select id="modal-select"><option value="" selected="" disabled="" hidden="">Selecciona un método de pago</option>${selectPayments}</select>
         <p>¿Estás seguro de continuar?</p>
         </div>
         <div>
