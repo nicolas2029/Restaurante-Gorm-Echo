@@ -1,6 +1,8 @@
 package seeders
 
 import (
+	"errors"
+
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/controller"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
@@ -62,11 +64,14 @@ func SeederOrder() error {
 	return controller.CreateOrder(&m)
 }
 
-func SeederAll(establishments, addresses, products, users, orders int) {
+func SeederAll(establishments, addresses, products, users, orders int) error {
 	totalEstablishment = establishments
 	totalAddress = establishments + addresses
 	totalProduct = products
 	totalUser = users
+	if totalUser < 0 || totalAddress < 0 || totalProduct < 0 || totalEstablishment < 0 {
+		return errors.New("ingresa un valor positivo mayor a uno al utilizar seeders")
+	}
 	SeederPay()
 	for i := 0; i < establishments; i++ {
 		SeederEstablishment()
@@ -83,4 +88,5 @@ func SeederAll(establishments, addresses, products, users, orders int) {
 	for i := 0; i < orders; i++ {
 		SeederOrder()
 	}
+	return nil
 }

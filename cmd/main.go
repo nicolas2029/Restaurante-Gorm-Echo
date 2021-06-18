@@ -12,8 +12,40 @@ import (
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/http/route"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/http/sessionsCookie"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
+	"github.com/nicolas2029/Restaurante-Gorm-Echo/seeders"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
 )
+
+func seedAll() error {
+	var establishments, addresses, products, users, orders int
+	fmt.Println("Enter the number of establishments: ")
+	_, err := fmt.Scan(&establishments)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Enter the number of addresses: ")
+	_, err = fmt.Scan(&addresses)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Enter the number of products: ")
+	_, err = fmt.Scan(&products)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Enter the number of users: ")
+	_, err = fmt.Scan(&users)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Enter the number of orders: ")
+	_, err = fmt.Scan(&orders)
+	if err != nil {
+		return err
+	}
+
+	return seeders.SeederAll(establishments, addresses, products, users, orders)
+}
 
 func newUser() error {
 	var rolID uint
@@ -77,6 +109,15 @@ func newDB() error {
 		if err != nil {
 			return err
 		}
+		isSeeder := ""
+		for isSeeder != "1" && isSeeder != "0" {
+			fmt.Println("Do you want to use the seeders(1.-Yes / 2.- No)?: ")
+			fmt.Scan(&isSeeder)
+			if isSeeder == "1" {
+				seedAll()
+			}
+		}
+
 	}
 	return nil
 }
@@ -96,6 +137,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("no se pudo cargar los certificados para email: %v", err)
 	}
+
 	err = storage.DB().AutoMigrate(
 		&model.Product{},
 		&model.Address{},
