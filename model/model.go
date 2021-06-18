@@ -1,7 +1,6 @@
 package model
 
 import (
-	"html/template"
 	"time"
 
 	"gorm.io/gorm"
@@ -100,15 +99,7 @@ type OrderProduct struct {
 	//Delivered uint `gorm:"type uint; not null; default 0; check:delivered <= amount" json:"delivered"`
 }
 
-type Template struct {
-	Templates *template.Template
-}
-
 type OrderOrderProduct struct {
 	Order        *Order          `json:"order"`
 	OrderProduct []*OrderProduct `json:"order_products"`
 }
-
-/*func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.Templates.ExecuteTemplate(w, name, data)
-}*/

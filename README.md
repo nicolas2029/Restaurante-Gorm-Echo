@@ -3,6 +3,7 @@
 ## Conexion a la base de datos
 
 ```go
+    //Conexion con postgres
     storage.New(storage.Postgres)
 ```
 
@@ -64,6 +65,8 @@ Cada permiso esta identificado por un id y posee una descripcion sobre su funcio
 16. Asignar rol de menor jerarquia de empleado dentro de un establecimiento
 
 ## Roles
+
+Los roles son un conjunto de permisos que puede tener un usuario.
 
 - **owner**
   - 1

@@ -25,7 +25,6 @@ var (
 	once sync.Once
 )
 
-// Driver of storage
 // Drivers
 const (
 	Postgres string = "POSTGRES"
@@ -44,6 +43,7 @@ func New(file string) {
 		}
 	})
 }
+
 func loadFileDB(file string) dbUser {
 	var err error
 	m, err := ioutil.ReadFile(file)
@@ -69,9 +69,9 @@ func newMySqlBD(u *dbUser) {
 	fmt.Println("conectado a MySql")
 }
 
+// newPostgresDB
 func newPostgresDB(u *dbUser) {
 	var err error
-	//"postgres://admin_restaurant:RestAuraNt_pgsql.561965697@localhost:5433/restaurante_gorm_echo?sslmode=disable"
 	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", u.User, u.Password, u.Port, u.NameDB)
 	db, err = gorm.Open(postgres.Open(dsn))
 	if err != nil {
