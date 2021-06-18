@@ -1,11 +1,93 @@
 # Restaurante-Gorm-Echo
 
-## Conexion a la base de datos
+## Requisitos
 
-```go
-    //Conexion con postgres
-    storage.New(storage.Postgres)
+Para el correcto funcionamiento del programa se debera contar con un sistema operativo Windows 7 o superior y tener el motor de base de datos MySql o PostgreSql
+
+## Estructura de archivos
+
+Para usar el programa se debera crear una carpeta llamada cmd y otra llamada public, ambas deben estar en el mismo directorio. El programa usa rutas relativas, por lo que se puede seleccionar cualquier directorio.
+
+A continuacion se muestra un ejemplo de la estructura de archivos.
+
+![Estructura de archivos](Estructura_archivos.jpg"Estructura de archivos")
+
+### Carpeta cmd
+
+Dentro de la carpeta cmd se encontrara el ejecutable o archivo main.go, ademas de otra carpeta llamada certificates
+
+#### Carpeta certificates
+
+Aqui se almacenaran todos las credenciales necesarias para el correcto funcionamiento del programa, los archivos necesarios son:
+
+- app.rsa
+
+- app.rsa.pub
+
+- cookieKey
+
+- db.json
+
+- email.json
+
+### Carpeta public
+
+Contendra la carpeta views/assets/img/product,  en dicha carpeta se almacenaran las imagenes de los productos.
+
+## Credenciales
+
+En total se debe de contar con 5 archivos, los cuales se mostraran a continuacion, las claves rsa pueden ser generadas en <https://travistidwell.com/jsencrypt/demo/>
+
+### app.rsa
+
+Este archivo contendra la clave rsa privada
+
+### app.rsa.pub
+
+Este archivo contendra la clave rsa publica
+
+### cookieKey
+
+Este archivo contendra una clave con una longitud de 32 caracteres
+
+### db.json
+
+Este archivo debe tener la siguiente estructura:
+
+```json
+{
+  "type_db":"",
+  "user":"",
+  "password":"",
+  "port":"",
+  "name_db":""
+}
 ```
+
+- **type_db:** especifica el tipo de base de datos, puede ser *POSTGRES* o *MYSQL*, seleccionar POSTGRES realizara una conexion con la base de datos en PostgreSql, en cambio si se selecciona MYSQL se realizara la conexion con MySql.
+
+- **user:** selecciona el usuario con el cual se accedera a la base de datos.
+
+- **password:** selecciona la contraseña del usuario.
+
+- **port:** selecciona el puerto con el cual establecera la conexion a la base de datos.
+
+- **name_db:** selecciona el nombre de la base de datos a la cual se conectara.
+
+### email.json
+
+Este archivo debe tener la siguiente estructura:
+
+```json
+{
+  "email":"",
+  "password":""
+}
+```
+
+- **email:** selecciona el email del cual seran enviados los codigos de verificacion.
+
+- **password:** selecciona la contraseña del email.
 
 ## Migraciones
 
@@ -26,7 +108,7 @@
 
 ## Contraseñas
 
-Las contraseñas deben de contener al menos una mayuscula, una minuscula y un caracter especial, ademas de tener una longitud mayor o igual a 8
+Las contraseñas de usuarios deben de contener al menos una mayuscula, una minuscula y un caracter especial, ademas de tener una longitud mayor o igual a 8
 
 ## Permisos
 
