@@ -8,6 +8,7 @@ import (
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/sysError"
 )
 
+// GetProduct return a product by ID
 func GetProduct(id uint) (model.Product, error) {
 	p := model.Product{}
 	err := storage.DB().First(&p, id).Error
@@ -21,11 +22,13 @@ func GetAllProduct() ([]model.Product, error) {
 	return ps, r.Error
 }
 
+// CreateProduct create a new product
 func CreateProduct(m *model.Product) error {
 	r := storage.DB().Create(m)
 	return r.Error
 }
 
+// UpdateProduct Update an existing product
 func UpdateProduct(m *model.Product) error {
 	r := storage.DB().Model(&model.Product{}).Where("id = ? and updated = false", m.ID).Update("updated", true)
 	if r.Error != nil {
@@ -41,6 +44,7 @@ func UpdateProduct(m *model.Product) error {
 	return CreateProduct(m)
 }
 
+// DeleteProduct use soft delete to remove a product
 func DeleteProduct(id uint) error {
 	r := storage.DB().Model(&model.Product{}).Where("id = ? and updated = false", id).Update("updated", true)
 	if r.Error != nil {

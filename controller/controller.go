@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// hasAndSalt encrypt using RSA
 func hashAndSalt(pwd []byte) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
@@ -17,16 +18,7 @@ func hashAndSalt(pwd []byte) ([]byte, error) {
 	return hash, nil
 }
 
-// hashPassword .
-func HashPassword(m *model.Login) error {
-	pwd, err := hashAndSalt([]byte(m.Password))
-	if err != nil {
-		return err
-	}
-	m.Password = string(pwd)
-	return nil
-}
-
+// HavePermission returns error if the user does not have the necessary permission
 func HavePermission(userId, permissionId uint) (uint, uint, error) {
 	var eId uint
 	m := model.Rol{}
@@ -56,6 +48,7 @@ func HavePermission(userId, permissionId uint) (uint, uint, error) {
 	return id, eId, nil
 }
 
+// isPasswordValid return true if the password is valid
 func isPasswordValid(pwd string) bool {
 	if len(pwd) < 8 {
 		return false
@@ -87,6 +80,7 @@ func isPasswordValid(pwd string) bool {
 	return hasLower && hasNumber && hasSpecial && hasUpperCase
 }
 
+// Return a table if the table is in the establishment else return an error
 func IsTableInEstablishment(tableID, establishmentID uint) (model.Table, error) {
 	m := &model.Table{}
 	err := storage.DB().Where("id = ? AND establishment_id = ?", tableID, establishmentID).First(m).Error
