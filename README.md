@@ -10,7 +10,7 @@ Para usar el programa se debera crear una carpeta llamada cmd y otra llamada pub
 
 A continuacion se muestra un ejemplo de la estructura de archivos.
 
-![Estructura de archivos](Estructura_archivos.jpg"Estructura de archivos")
+![Estructura de archivos](Estructura_archivos.jpg "Estructura de archivos")
 
 ### Carpeta cmd
 
