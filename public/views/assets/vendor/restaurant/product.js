@@ -342,12 +342,12 @@ function caseNotLogin() {
     <form class="php-email-form" action="">
         <div class="form-row">
         <div class="col-lg-4 col-md-6 form-group">
-            <input type="email" class="form-control" name="email" id="email" placeholder="Tu Correo Electrónico" oninput="return válidar_email(email.value)" data-rule="email" data-msg="Please enter a valid email">
+            <input type="email" class="form-control" name="email" id="email" placeholder="Tu Correo Electrónico" oninput="return validar_email(email.value)" data-rule="email" data-msg="Please enter a valid email">
             <span id="email-error">Email no valido</span>
             <div class="validate"></div>
         </div>
         <div class="col-lg-4 col-md-6 form-group">
-            <input type="password" class="form-control" name="password" id="password" placeholder="Ingresa una contraseña" oninput="return válidar_clave(password.value)" data-msg="Please enter at least 4 chars">
+            <input type="password" class="form-control" name="password" id="password" placeholder="Ingresa una contraseña" oninput="return validar_clave(password.value)" data-msg="Please enter at least 4 chars">
             <span id="password-error">Contraseña no válida</span>
             <div class="validate"></div>
         </div>

@@ -808,7 +808,7 @@ function showHireFireUser(){
 }
 
 function showCRUDEstablishment(){
-    document.getElementById("nav-create-establishment").innerHTML = `<a href="#create-establishment">Crear Establecimiento</a>`
+    document.getElementById("nav-create-establishment").innerHTML = `<a href="#create-establishment">Establecimientos</a>`
     document.getElementById("create-establishment").innerHTML = `<div class="container">
     <div class="section-title">
     <h2>Registrar/Actualizar <span>Establecimiento</span></h2>
@@ -843,7 +843,7 @@ function showCRUDEstablishment(){
         <select name="form-crud-establishment" id="crud-select-establishment" required>
         </select>
     </div>
-    <div class="text-center" onclick="openModal('crudEstablishment', 'Establecimiento')"><button type="button">Registrar establecimiento</button></div>
+    <div class="text-center" onclick="openModal('crudEstablishment', 'Establecimiento')"><button type="button">Enviar establecimiento</button></div>
     </form>
     </div>`
 }
