@@ -34,6 +34,8 @@ Aquí se almacenarán todas las credenciales necesarias para el correcto funcion
 
 Dentro se almacenará la carpeta views, en la cual estará todo el código html, js y css.
 
+La carpeta template contendrá el archivo confirm.html, el cual será usado como plantilla al momento de enviar los códigos de confirmación.
+
 También contendrá la carpeta views/assets/img/products/,  en dicha carpeta se almacenarán las imágenes de los productos de forma automática.
 
 ## Credenciales
