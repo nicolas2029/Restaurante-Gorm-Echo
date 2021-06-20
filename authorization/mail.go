@@ -71,7 +71,7 @@ func confirmEmail(dest, token string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 
-	t, err := template.ParseFiles("../model/confirm.html")
+	t, err := template.ParseFiles("../public/template/confirm.html")
 	if err != nil {
 		return err
 	}

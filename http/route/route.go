@@ -1,8 +1,6 @@
 package route
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/http/handler"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/http/middleware"
@@ -37,14 +35,6 @@ func Product(e *echo.Echo) {
 	g.POST("/img/:name", handler.SaveImage)
 }
 
-func ViewProduct(e *echo.Echo) {
-	g := e.Group("productos")
-	g.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "products.html", "lista de productos")
-	})
-
-}
-
 func Address(e *echo.Echo) {
 	g := e.Group("api/v1/address")
 	g.GET("/:id", middleware.AuthorizeIsLogin(handler.GetAddress))
@@ -77,7 +67,6 @@ func Rol(e *echo.Echo) {
 
 func User(e *echo.Echo) {
 	g := e.Group("api/v1/user")
-	//sessions.Cookie().Get(e)
 	g.GET("/:id", middleware.AuthorizeIsUser(handler.GetUser))
 	g.GET("/", middleware.AuthorizeWithRol(handler.GetAllUser, withoutRestrictions))
 	g.PATCH("/password/", middleware.AuthorizeIsLogin(handler.UpdateUserPassword))
@@ -103,7 +92,6 @@ func Admin(e *echo.Echo) {
 
 func Pay(e *echo.Echo) {
 	g := e.Group("api/v1/pay")
-	//sessions.Cookie().Get(e)
 	g.GET("/:id", handler.GetPay)
 	g.GET("/", handler.GetAllPay)
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreatePay, crudPayMethod))
@@ -114,7 +102,6 @@ func Pay(e *echo.Echo) {
 
 func Table(e *echo.Echo) {
 	g := e.Group("api/v1/table")
-	//sessions.Cookie().Get(e)
 	g.GET("/:id", handler.GetTable)
 	g.GET("/", handler.GetAllTable)
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateTable, crudTable))
@@ -125,7 +112,6 @@ func Table(e *echo.Echo) {
 
 func Establishment(e *echo.Echo) {
 	g := e.Group("api/v1/establishment")
-	//sessions.Cookie().Get(e)
 	g.GET("/:id", handler.GetEstablishment)
 	g.GET("/", handler.GetAllEstablishment)
 	g.GET("/order/", handler.GetAllEstablishment)
@@ -138,18 +124,12 @@ func Establishment(e *echo.Echo) {
 
 func OrderRemote(e *echo.Echo) {
 	g := e.Group("api/v1/order/remote")
-	//g.GET("/:id", handler.GetOrder)
-	//g.GET("/", handler.GetAllOrder)
 	g.POST("/", middleware.AuthorizeIsLogin(handler.CreateOrderRemote))
 	g.PATCH("/:id", middleware.AuthorizeWithRol(handler.CompleteOrderRemote, showOrdersIncompleteByStablishment))
-	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
-	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
-
 }
 
 func Order(e *echo.Echo) {
 	g := e.Group("api/v1/order")
-	//g.GET("/:id", handler.GetOrder)
 	g.GET("/", middleware.AuthorizeIsLogin(handler.GetAllOrderByUser))
 	g.POST("/", middleware.AuthorizeWithRol(handler.CreateOrder, makeOrderEstablishment))
 	g.PUT("/:id", middleware.AuthorizeWithRol(handler.AddProductsToOrder, makeOrderEstablishment))
@@ -157,27 +137,17 @@ func Order(e *echo.Echo) {
 	g.GET("/establishment/all", middleware.AuthorizeWithRol(handler.GetAllOrdersByEstablishment, showInvoice))
 	g.PATCH("/:id", middleware.AuthorizeWithRol(handler.CompleteOrder, makeOrderEstablishment))
 	g.GET("/user/", middleware.AuthorizeWithRol(handler.GetAllOrdersPendingByUser, makeOrderEstablishment))
-	//g.PUT("/:id", middleware.AuthorizeIsLogin(handler.UpdateOrder))
-	//g.DELETE("/:id", middleware.AuthorizeIsLogin(handler.DeleteOrder))
+
 }
 
 func View(e *echo.Echo) {
 	route := "../public/views/"
 	e.Static("/", route)
-	//e.Renderer = handler.NewRender()
-	//e.Static("/table/", route+"table/")
-	/*e.GET("/table/", func(c echo.Context) error {
-		template.ParseFiles(route + "table/")
-		return c.Render(http.StatusOK, route+"table/", "ok")
-	})*/
-	//e.Static("/", route+"index.html")
-
 }
 
 func All(e *echo.Echo) {
 	e.Use(middleware.SwitchResponse)
 	Product(e)
-	ViewProduct(e)
 	Address(e)
 	Permission(e)
 	Rol(e)
