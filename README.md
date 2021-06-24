@@ -114,7 +114,7 @@ El programa realiza las migraciones de todos los modelos dentro de la función A
 
 ## Contraseñas
 
-Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula y un carácter especial, además de tener una longitud mayor o igual a 8
+Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula, un número y un carácter especial, además de tener una longitud mayor o igual a 8
 
 ## Primera ejecución del programa
 
