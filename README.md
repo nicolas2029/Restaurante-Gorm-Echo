@@ -2,12 +2,12 @@
 
 ## Descripcion
 
-Este proyecto sirve como un sistema de administración para una cadena de restaurantes, en donde se podrá ver el menú de productos que ofrece la empresa, los usuarios registrados podrán realizar pedidos a domicilio, ver su historial de pedidos realizados y descargar un pdf de estos. Dentro de la página principal los usuarios podrán crear una cuenta nueva o loguearse con sus credenciales. Se contará con un sistema de roles en donde se encuentra el Dueño, los Administradores, Gerentes, Mesero y el rol de Cocina.
+Este proyecto sirve como un sistema de administración para una cadena de restaurantes, en donde se podrá ver el menú de productos que ofrece la empresa, los usuarios registrados podrán realizar pedidos a domicilio, ver su historial de pedidos realizados y descargar un pdf de estos. Dentro de la página principal los usuarios podrán crear una cuenta nueva o loguearse con sus credenciales. Se contará con un sistema de roles en donde se encuentra el Dueño, los Administradores, Gerentes, Meseros y el rol de Cocina.
 
 Los usuarios con rol podrán acceder a una página de administración, dependiendo del rol se mostrarán diferentes opciones y formularios.
 Los administradores y dueño podrán dar de alta y actualizar los establecimientos de la cadena, realizar cambios en el menú (añadir, eliminar y actualizar productos), contratar y despedir usuarios con rol de menor jerarquía y seleccionar el establecimiento en el cual trabajarán.
 Los gerentes podrán contratar y despedir usuarios en su establecimiento, también podrán ver el historial de pedidos realizados en su establecimiento.
-Los meseros podrán realizar pedidos en su establecimiento seleccionando una mesa y ocupando, también tendrá acceso a un historial de pedidos sin completar en donde podrán pulsar un pedido y seleccionar un método de pago para completar el pedido.
+Los meseros podrán realizar pedidos en su establecimiento seleccionando una mesa y ocupandola, también tendrá acceso a un historial de pedidos sin completar en donde podrán pulsar un pedido y seleccionar un método de pago para completar el pedido.
 Por último el rol de cocina tendrá acceso a todos los pedidos pendientes realizados hacia su establecimiento, ya sean pedidos a domicilio o pedidos creados por meseros dentro del local, también podrán marcar como completados los pedidos a domicilio.
 
 ## Integrantes
@@ -134,7 +134,7 @@ El programa realiza las migraciones de todos los modelos dentro de la función A
 
 ## Contraseñas
 
-Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula y un carácter especial, además de tener una longitud mayor o igual a 8
+Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula, un número y un carácter especial, además de tener una longitud mayor o igual a 8
 
 ## Primera ejecución del programa
 
