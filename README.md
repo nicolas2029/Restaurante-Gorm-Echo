@@ -175,7 +175,7 @@ Los roles son un conjunto de permisos que puede tener un usuario. A continuació
   - 11
   - 12
   - 13
-- **Manager**
+- **Gerente**
   - 9
   - 10
   - 11
