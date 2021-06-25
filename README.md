@@ -108,7 +108,7 @@ Este archivo debe tener la siguiente estructura:
   "password":"",
   "email":"",
   "host":"",
-  "port":"",
+  "port":""
 }
 
 ```
