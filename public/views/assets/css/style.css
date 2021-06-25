@@ -1351,10 +1351,11 @@ section {
   .gallery .php-email-form select {
     background: #ffb03b;
     border: 0;
-    padding: 10px 24px;
+    padding: 10px 20px;
     color: #fff;
     transition: 0.4s;
     border-radius: 50px;
+    width: 300px;
   }
 
   .box button[type="button"] {

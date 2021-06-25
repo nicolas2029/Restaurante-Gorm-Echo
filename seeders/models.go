@@ -23,8 +23,13 @@ func fakerAddress() model.Address {
 func fakerProduct() model.Product {
 	des := faker.Lorem().Sentence(5)
 	img := faker.Avatar().Url("jpg", 800, 822)
+	color := faker.Commerce().Color()
+	name := faker.Commerce().ProductName() + " " + color
+	for len(name) < 25 {
+		name = faker.Commerce().ProductName() + " " + color
+	}
 	m := model.Product{
-		Name:        faker.Commerce().ProductName(),
+		Name:        name,
 		Price:       float64(faker.Commerce().Price()),
 		Description: &des,
 		Img:         &img,

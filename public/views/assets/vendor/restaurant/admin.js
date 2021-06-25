@@ -254,7 +254,7 @@ function addOrderProductToOrder(tableID, products) {
     products.forEach(val => {orderProduct += loadOrderProduct(val)});
     total += parseInt(document.getElementById(`i-p-${tableID}`).value);
     document.getElementById(`i-p-${tableID}`).value = total;
-    document.getElementById(`p-${tableID}`).innerHTML = `Precio Total: ${total}`;
+    document.getElementById(`p-${tableID}`).innerHTML = `Precio Total: ${total.toFixed(2)}`;
     document.getElementById(`box-pending-${tableID}`).innerHTML += orderProduct;
 }
 
@@ -282,15 +282,15 @@ function loadOrderProduct(product) {
     if(mapProduct.has(product.product_id)){
         total += product.amount*mapProduct.get(product.product_id).price
         return `<h5>${mapProduct.get(product.product_id).name}</h5>
-        <p>Precio unitatio - ${mapProduct.get(product.product_id).price}</p>
+        <p>Precio unitatio - ${mapProduct.get(product.product_id).price.toFixed(2)}</p>
         <p>Cantidad - ${product.amount}</p>
-        <p>Precio total - ${product.amount*mapProduct.get(product.product_id).price}</p>`
+        <p>Precio total - ${(product.amount*mapProduct.get(product.product_id).price).toFixed(2)}</p>`
     }else{
         total += product.amount*mapProductUpdate.get(product.product_id).price
         return `<h5>${mapProductUpdate.get(product.product_id).name}</h5>
-        <p>Precio unitatio - ${mapProductUpdate.get(product.product_id).price}</p>
+        <p>Precio unitatio - ${mapProductUpdate.get(product.product_id).price.toFixed(2)}</p>
         <p>Cantidad - ${product.amount}</p>
-        <p>Precio total - ${product.amount*mapProductUpdate.get(product.product_id).price}</p>`
+        <p>Precio total - ${(product.amount*mapProductUpdate.get(product.product_id).price).toFixed(2)}</p>`
     }
 }
 
@@ -377,7 +377,7 @@ function loadOrderSection(o) {
 
 function updateTotal(amount, price, id, item, key) {
     if (amount > 0){
-        document.getElementById(id).innerText= `Precio Total: ${amount*price}`;
+        document.getElementById(id).innerText= `Precio Total: ${(amount*price).toFixed(2)}`;
         myMap.set(key, amount);
     }else{
         let node = document.getElementById(item);
@@ -601,10 +601,10 @@ function addProduct(key, amount, src, name, price, description) {
                     <label>${name}</label>
                 </div>
                 <div>
-                    <input class="form-control" id="${idInput}" type="number" min=0 onchange="updateTotal(this.value, ${price}, '${id}', '${idItem}', ${key})">
+                    <input class="form-control" id="${idInput}" type="number" min=0 onchange="updateTotal(this.value, ${price.toFixed(2)}, '${id}', '${idItem}', ${key})">
                 </div>
                 <div align="center">
-                    <label id="${id}">Precio Total: ${price}</label>
+                    <label id="${id}">Precio Total: ${price.toFixed(2)}</label>
                 </div>
             </div>
         </div>`;
@@ -628,7 +628,7 @@ function loadMenuProduct(data, funcName) {
     var temp = 
     `<div class="col-lg-6 menu-item">
     <div class="menu-content">
-    <button name="button-menu" onclick="${funcName}(${data.id}, 1, '${data.img}', '${data.name}', ${data.price}, '${data.description}')">${data.name}</button><span>$${data.price}</span>
+    <button name="button-menu" onclick="${funcName}(${data.id}, 1, '${data.img}', '${data.name}', ${data.price}, '${data.description}')">${data.name}</button><span>$${data.price.toFixed(2)}</span>
     </div>
     <div class="menu-ingredients">${data.description}</div>
     </div>`;
