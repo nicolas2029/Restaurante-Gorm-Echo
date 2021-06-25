@@ -28,7 +28,7 @@ Para el correcto funcionamiento del programa se deberá contar el lenguaje de pr
 
 ## Instalacion
 
-Para usar el programa se deberá crear una carpeta llamada cmd y otra llamada public, ambas deben estar en el mismo directorio. El programa usa rutas relativas, por lo que se puede seleccionar cualquier directorio.
+Para usar el programa se deberá crear una carpeta llamada cmd y otra llamada public, ambas deben estar en el mismo directorio. El programa usa rutas relativas, por lo que se puede seleccionar cualquier directorio. Se deberán llenar los archivos de la carpeta certificates, se recomienda generar sus propios archivos app.rsa, app.rsa.pub y cookieKey, pero también se puede hacer uso de los archivos de ejemplo con los que cuenta el repositorio, los archivos db.json y email.json se deberán llenar con sus propios datos como se muestra más adelante.
 
 A continuación se muestra un ejemplo de la estructura de archivos.
 
@@ -96,7 +96,7 @@ Este archivo debe tener la siguiente estructura:
 
 - **port:** selecciona el puerto con el cual establece la conexión a la base de datos.
 
-- **name_db:** selecciona el nombre de la base de datos existente a la cual se conectara.
+- **name_db:** selecciona el nombre de la base de datos existente (no necesita contener tablas, el programa realiza las migraciones automaticamente) a la cual se conectara.
 
 ### email.json
 
@@ -104,14 +104,24 @@ Este archivo debe tener la siguiente estructura:
 
 ```json
 {
+  "user":"",
+  "password":"",
   "email":"",
-  "password":""
+  "host":"",
+  "port":"",
 }
+
 ```
 
-- **email:** selecciona el email del cual seran enviados los codigos de verificacion.
+- **usuario:** usuario/email para realizar la conexión.
 
-- **password:** selecciona la contraseña del email, en caso de usar Gmail utilizar una contraseña de aplicación como se muestra en el siguiente enlace: <https://support.google.com/mail/answer/185833?hl=es>.
+- **password:** Selecciona la contraseña del usuario, en caso de usar Gmail utilizar una contraseña de aplicación como se muestra en el siguiente enlace: <https://support.google.com/mail/answer/185833?hl=es>.
+
+- **email:** selecciona el email del cual serán enviados los códigos de verificación, si se usa Gmail utilizar el mismo correo que se especificó en el campo usuario.
+
+- **host:** selecciona el host al cual se establecerá la conexión smtp, para mailtrap utilizar el host: *smtp.mailtrap.io*, en caso de usar gmail utilizar el host: *smtp.gmail.com*.
+
+- **port:** selecciona el puerto.
 
 ## Migraciones
 
