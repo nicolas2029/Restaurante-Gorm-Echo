@@ -1,12 +1,34 @@
 # Restaurante-Gorm-Echo
 
+## Descripcion
+
+Este proyecto sirve como un sistema de administración para una cadena de restaurantes, en donde se podrá ver el menú de productos que ofrece la empresa, los usuarios registrados podrán realizar pedidos a domicilio, ver su historial de pedidos realizados y descargar un pdf de estos. Dentro de la página principal los usuarios podrán crear una cuenta nueva o loguearse con sus credenciales. Se contará con un sistema de roles en donde se encuentra el Dueño, los Administradores, Gerentes, Meseros y el rol de Cocina.
+
+Los usuarios con rol podrán acceder a una página de administración, dependiendo del rol se mostrarán diferentes opciones y formularios.
+Los administradores y dueño podrán dar de alta y actualizar los establecimientos de la cadena, realizar cambios en el menú (añadir, eliminar y actualizar productos), contratar y despedir usuarios con rol de menor jerarquía y seleccionar el establecimiento en el cual trabajarán.
+Los gerentes podrán contratar y despedir usuarios en su establecimiento, también podrán ver el historial de pedidos realizados en su establecimiento.
+Los meseros podrán realizar pedidos en su establecimiento seleccionando una mesa y ocupandola, también tendrá acceso a un historial de pedidos sin completar en donde podrán pulsar un pedido y seleccionar un método de pago para completar el pedido.
+Por último el rol de cocina tendrá acceso a todos los pedidos pendientes realizados hacia su establecimiento, ya sean pedidos a domicilio o pedidos creados por meseros dentro del local, también podrán marcar como completados los pedidos a domicilio.
+
+## Integrantes
+
+Nicolas Gomez
+
+Hilario Raygoza
+
 ## Requisitos
 
-Para el correcto funcionamiento del programa se deberá contar con un sistema operativo Windows 7 o superior y tener el motor de base de datos MySql o PostgreSql
+### Utilizando el ejecutable main.exe
 
-## Estructura de archivos
+Para el correcto funcionamiento del programa se deberá contar con un sistema operativo Windows 7 o superior y tener el motor de base de datos MySql o PostgreSql.
 
-Para usar el programa se deberá crear una carpeta llamada cmd y otra llamada public, ambas deben estar en el mismo directorio. El programa usa rutas relativas, por lo que se puede seleccionar cualquier directorio.
+### Utilizando Golang
+
+Para el correcto funcionamiento del programa se deberá contar el lenguaje de programación Golang 1.16 o superior y tener el motor de base de datos MySql o PostgreSql.
+
+## Instalacion
+
+Para usar el programa se deberá crear una carpeta llamada cmd y otra llamada public, ambas deben estar en el mismo directorio. El programa usa rutas relativas, por lo que se puede seleccionar cualquier directorio. Se deberán llenar los archivos de la carpeta certificates, se recomienda generar sus propios archivos app.rsa, app.rsa.pub y cookieKey, pero también se puede hacer uso de los archivos de ejemplo con los que cuenta el repositorio, los archivos db.json y email.json se deberán llenar con sus propios datos como se muestra más adelante.
 
 A continuación se muestra un ejemplo de la estructura de archivos.
 
@@ -74,7 +96,7 @@ Este archivo debe tener la siguiente estructura:
 
 - **port:** selecciona el puerto con el cual establece la conexión a la base de datos.
 
-- **name_db:** selecciona el nombre de la base de datos a la cual se conectara.
+- **name_db:** selecciona el nombre de la base de datos existente (no necesita contener tablas, el programa realiza las migraciones automaticamente) a la cual se conectara.
 
 ### email.json
 
@@ -82,14 +104,24 @@ Este archivo debe tener la siguiente estructura:
 
 ```json
 {
+  "user":"",
+  "password":"",
   "email":"",
-  "password":""
+  "host":"",
+  "port":""
 }
+
 ```
 
-- **email:** selecciona el email del cual seran enviados los codigos de verificacion.
+- **usuario:** usuario/email para realizar la conexión.
 
-- **password:** selecciona la contraseña del email.
+- **password:** Selecciona la contraseña del usuario, en caso de usar Gmail utilizar una contraseña de aplicación como se muestra en el siguiente enlace: <https://support.google.com/mail/answer/185833?hl=es>.
+
+- **email:** selecciona el email del cual serán enviados los códigos de verificación, si se usa Gmail utilizar el mismo correo que se especificó en el campo usuario.
+
+- **host:** selecciona el host al cual se establecerá la conexión smtp, para mailtrap utilizar el host: *smtp.mailtrap.io*, en caso de usar gmail utilizar el host: *smtp.gmail.com*.
+
+- **port:** selecciona el puerto.
 
 ## Migraciones
 
@@ -112,7 +144,7 @@ El programa realiza las migraciones de todos los modelos dentro de la función A
 
 ## Contraseñas
 
-Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula y un carácter especial, además de tener una longitud mayor o igual a 8
+Las contraseñas de usuarios deben de contener al menos una mayúscula, una minúscula, un número y un carácter especial, además de tener una longitud mayor o igual a 8
 
 ## Primera ejecución del programa
 
