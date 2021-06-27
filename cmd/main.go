@@ -110,7 +110,7 @@ func newDB() error {
 			return err
 		}
 		isSeeder := ""
-		for isSeeder != "1" && isSeeder != "0" {
+		for isSeeder != "1" && isSeeder != "2" {
 			fmt.Println("Do you want to use the seeders(1.-Yes / 2.- No)?: ")
 			fmt.Scan(&isSeeder)
 			if isSeeder == "1" {
