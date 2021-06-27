@@ -3,5 +3,5 @@
     "password":"",
     "email":"beerparacreer@example.com",
     "host":"smtp.mailtrap.io",
-    "port":"25"
+    "port":"465"
 }
