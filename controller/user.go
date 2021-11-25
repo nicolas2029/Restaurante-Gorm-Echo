@@ -172,7 +172,7 @@ func CreateUser(m *model.User) error {
 	}
 	err = sendCodeConfirmationToEmail(m.Email, token)
 	if err != nil {
-		fmt.Errorf("error in createUser: %s", err)
+		return fmt.Errorf("error in createUser: %s", err)
 	}
 	m.Password = string(pwd)
 	r := storage.DB().Create(m)

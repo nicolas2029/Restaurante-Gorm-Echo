@@ -16,6 +16,7 @@ import (
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/model"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/seeders"
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/storage"
+	"github.com/nicolas2029/Restaurante-Gorm-Echo/sysError"
 )
 
 func seedAll() error {
@@ -23,6 +24,7 @@ func seedAll() error {
 }
 
 func newUser() error {
+	var id uint
 	email, isEnv := os.LookupEnv("RGE_OWNER_MAIL")
 	if !isEnv {
 		return errors.New("environment variable (RGE_OWNER_MAIL) not found")
@@ -31,9 +33,11 @@ func newUser() error {
 	if !isEnv {
 		return errors.New("environment variable (RGE_OWNER_PASSWORD) not found")
 	}
+	id = 1
 	user := model.User{
 		Email:    email,
 		Password: password,
+		RolID:    &id,
 	}
 	return controller.CreateUser(&user)
 }
@@ -82,10 +86,13 @@ func newDB() error {
 		}
 	}
 
-	err = storage.DB().First(&model.User{}, "is_confirmated = true and rol_id = 1").Error
+	err = storage.DB().First(&model.User{}, "rol_id = 1").Error
 	if err != nil {
 		err = newUser()
 		if err != nil {
+			if err == sysError.ErrEmailAlreadyInUsed {
+				return nil
+			}
 			return err
 		}
 		isSeeder, isEnv := os.LookupEnv("RGE_SEEDER")

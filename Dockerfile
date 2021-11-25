@@ -29,7 +29,6 @@ ENV RGE_MAIL_PORT 465
 ENV RGE_MAIL_NAME beerparacreer@example.com
 ENV RGE_MAIL_HOST smtp.mailtrap.io
 ENV RGE_MAIL_CODE_HOST http://localhost
-
 COPY --from=0 /app/public ./public
 COPY --from=0 /app/main ./
 

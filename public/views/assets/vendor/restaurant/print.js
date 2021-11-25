@@ -6,6 +6,8 @@ let selectPayments="";
 let amountNav = 0;
 let establishments;
 let mapEstablishments = new Map();
+let hostName = window.location.hostname
+let protocol = window.location.protocol
 let urlApi = `${protocol}//${hostName}:30000`
 
 
