@@ -1,10 +1,9 @@
 package storage
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"sync"
 
 	"gorm.io/driver/mysql"
@@ -18,6 +17,7 @@ type dbUser struct {
 	Password string `json:"password"`
 	Port     string `json:"port"`
 	NameDB   string `json:"name_db"`
+	Host     string `json:"host"`
 }
 
 var (
@@ -29,12 +29,13 @@ var (
 const (
 	Postgres string = "POSTGRES"
 	MySql    string = "MYSQL"
+	Oracle   string = "ORACLE"
 )
 
 // New create the connection with db
-func New(file string) {
+func New() {
 	once.Do(func() {
-		u := loadFileDB(file)
+		u := loadData()
 		switch u.TypeDB {
 		case Postgres:
 			newPostgresDB(&u)
@@ -44,23 +45,45 @@ func New(file string) {
 	})
 }
 
-func loadFileDB(file string) dbUser {
-	var err error
-	m, err := ioutil.ReadFile(file)
-	if err != nil {
-		log.Fatalf("no se pudo cargar las credenciales de DB: %v", err)
+func getEnv(env string) (string, error) {
+	s, f := os.LookupEnv(env)
+	if !f {
+		return "", fmt.Errorf("environment variable (%s) not found", env)
 	}
-	u := dbUser{}
-	err = json.Unmarshal(m, &u)
+	return s, nil
+}
+
+func loadData() dbUser {
+	typeDb, err := getEnv("RGE_TYPE")
 	if err != nil {
-		log.Fatalf("fallo en unmarshal DB: %v", err)
+		log.Fatalf(err.Error())
 	}
-	return u
+	user, err := getEnv("RGE_USER")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	password, err := getEnv("RGE_PASSWORD")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	port, err := getEnv("RGE_PORT")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	name, err := getEnv("RGE_NAME_DB")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	host, err := getEnv("RGE_HOST")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	return dbUser{typeDb, user, password, port, name, host}
 }
 
 func newMySqlBD(u *dbUser) {
 	var err error
-	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", u.User, u.Password, u.Port, u.NameDB)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", u.User, u.Password, u.Host, u.Port, u.NameDB)
 	db, err = gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		log.Fatalf("no se pudo abrir la base de datos: %v", err)
@@ -72,7 +95,7 @@ func newMySqlBD(u *dbUser) {
 // newPostgresDB
 func newPostgresDB(u *dbUser) {
 	var err error
-	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", u.User, u.Password, u.Port, u.NameDB)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", u.User, u.Password, u.Host, u.Port, u.NameDB)
 	db, err = gorm.Open(postgres.Open(dsn))
 	if err != nil {
 		log.Fatalf("no se pudo abrir la base de datos: %v", err)

@@ -3,12 +3,11 @@ package authorization
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/mail"
 	"net/smtp"
+	"os"
 	"sync"
 	"text/template"
 )
@@ -19,6 +18,7 @@ type jsonEmail struct {
 	Email    string `json:"email"`
 	Host     string `json:"host"`
 	Port     string `json:"port"`
+	CodeHost string
 }
 
 type send struct {
@@ -32,25 +32,51 @@ var (
 )
 
 // LoadFiles .
-func LoadMail(file string) error {
+func LoadMail() error {
 	var err error
 	onceMail.Do(func() {
-		err = loadMail(file)
+		err = loadData()
 	})
 
 	return err
 }
 
-func loadMail(file string) error {
-	m, err := ioutil.ReadFile(file)
+func getEnv(env string) (string, error) {
+	s, f := os.LookupEnv(env)
+	if !f {
+		return "", fmt.Errorf("environment variable (%s) not found", env)
+	}
+	return s, nil
+}
+
+func loadData() error {
+	user, err := getEnv("RGE_MAIL_USER")
 	if err != nil {
 		return err
 	}
-	config = &jsonEmail{}
-	err = json.Unmarshal(m, config)
+	password, err := getEnv("RGE_MAIL_PASSWORD")
 	if err != nil {
 		return err
 	}
+	port, err := getEnv("RGE_MAIL_PORT")
+	if err != nil {
+		return err
+	}
+	mail, err := getEnv("RGE_MAIL_NAME")
+	if err != nil {
+		return err
+	}
+	host, err := getEnv("RGE_MAIL_HOST")
+	if err != nil {
+		return err
+	}
+	code, err := getEnv("RGE_MAIL_CODE_HOST")
+	if err != nil {
+		return err
+	}
+	je := jsonEmail{user, password, mail, host, port, code}
+
+	config = &je
 	auth = LoginAuth(config.User, config.Password)
 	return nil
 }
@@ -156,11 +182,12 @@ func confirmEmail(dest, token string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n"
-	t, err := template.ParseFiles("../public/template/confirm.html")
+	t, err := template.ParseFiles("public/template/confirm.html")
 	if err != nil {
 		return err
 	}
-	s := send{Url: "http://localhost/api/v1/user/validate/" + token}
+	urlSend := fmt.Sprintf("%s/api/v1/user/validate/", config.CodeHost)
+	s := send{Url: urlSend + token}
 	buf := new(bytes.Buffer)
 	err = t.Execute(buf, s)
 	if err != nil {

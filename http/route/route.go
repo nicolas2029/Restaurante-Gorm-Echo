@@ -141,7 +141,7 @@ func Order(e *echo.Echo) {
 }
 
 func View(e *echo.Echo) {
-	route := "../public/views/"
+	route := "public/views/"
 	e.Static("/", route)
 }
 

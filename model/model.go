@@ -89,14 +89,11 @@ type Order struct {
 }
 
 type OrderProduct struct {
-	ID uint `gorm:"primarykey" json:"id"`
-	//Price     float64 `gorm:"float; not null" json:"price"`
+	ID        uint `gorm:"primarykey" json:"id"`
 	OrderID   uint `gorm:"primaryKey" json:"order_id"`
 	ProductID uint `gorm:"primaryKey" json:"product_id"`
-	//Product   Product `json:"product"`
-	Amount uint `gorm:"type uint; check:amount > 0; not null" json:"amount"`
-	IsDone bool `gorm:"type bool; default false; not null" json:"is_done"`
-	//Delivered uint `gorm:"type uint; not null; default 0; check:delivered <= amount" json:"delivered"`
+	Amount    uint `gorm:"type uint; check:amount > 0; not null" json:"amount"`
+	IsDone    bool `gorm:"type bool; default false; not null" json:"is_done"`
 }
 
 type OrderOrderProduct struct {

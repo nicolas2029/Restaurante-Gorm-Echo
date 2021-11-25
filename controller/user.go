@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/mail"
 
 	"github.com/nicolas2029/Restaurante-Gorm-Echo/authorization"
@@ -156,7 +157,7 @@ func CreateUser(m *model.User) error {
 		if !u.IsConfirmated {
 			err = sendCodeConfirmationToEmail(m.Email, token)
 			if err != nil {
-				return err
+				return fmt.Errorf("error in createUser !u.IsConfirmated: %s", err)
 			}
 		}
 		return sysError.ErrEmailAlreadyInUsed
@@ -171,7 +172,7 @@ func CreateUser(m *model.User) error {
 	}
 	err = sendCodeConfirmationToEmail(m.Email, token)
 	if err != nil {
-		return err
+		fmt.Errorf("error in createUser: %s", err)
 	}
 	m.Password = string(pwd)
 	r := storage.DB().Create(m)

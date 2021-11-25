@@ -1,8 +1,7 @@
 package sessionsCookie
 
 import (
-	"io/ioutil"
-	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -20,13 +19,10 @@ func Cookie() *gormstore.Store {
 	return cookie
 }
 
-func NewCookieStore(file string) error {
+func NewCookieStore() error {
 	var err error
 	once.Do(func() {
-		err = loadKey(file)
-		if err != nil {
-			log.Fatalf("No se pudo cargar la clave de cookies %v", err)
-		}
+		loadKey()
 		cookie = gormstore.New(storage.DB(), key)
 		quit := make(chan struct{})
 		go cookie.PeriodicCleanup(1*time.Hour, quit)
@@ -34,11 +30,7 @@ func NewCookieStore(file string) error {
 	return err
 }
 
-func loadKey(file string) error {
-	var err error
-	key, err = ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-	return nil
+func loadKey() {
+	keys, _ := os.LookupEnv("RGE_COOKIE_KEY")
+	key = []byte(keys)
 }

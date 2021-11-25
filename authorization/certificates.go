@@ -2,7 +2,7 @@ package authorization
 
 import (
 	"crypto/rsa"
-	"io/ioutil"
+	"os"
 	"sync"
 
 	"github.com/dgrijalva/jwt-go"
@@ -15,27 +15,22 @@ var (
 )
 
 // LoadFiles .
-func LoadFiles(privateFile, publicFile string) error {
+
+func LoadCertificates() error {
 	var err error
 	once.Do(func() {
-		err = loadFiles(privateFile, publicFile)
+		err = loadCertificates()
 	})
 
 	return err
 }
 
-func loadFiles(privateFile, publicFile string) error {
-	privateBytes, err := ioutil.ReadFile(privateFile)
-	if err != nil {
-		return err
-	}
+func loadCertificates() error {
+	privateBytes, _ := os.LookupEnv("RGE_RSA")
 
-	publicBytes, err := ioutil.ReadFile(publicFile)
-	if err != nil {
-		return err
-	}
+	publicBytes, _ := os.LookupEnv("RGE_RSA_PUB")
 
-	return parseRSA(privateBytes, publicBytes)
+	return parseRSA([]byte(privateBytes), []byte(publicBytes))
 }
 
 func parseRSA(privateBytes, publicBytes []byte) error {
