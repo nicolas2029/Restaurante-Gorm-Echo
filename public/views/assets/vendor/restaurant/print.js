@@ -6,6 +6,8 @@ let selectPayments="";
 let amountNav = 0;
 let establishments;
 let mapEstablishments = new Map();
+let urlApi = `${protocol}//${hostName}:30000`
+
 
 function showNavResponse(){
     document.getElementsByClassName("mobile-nav-toggle d-lg-none")[0].addEventListener("click", () => {
@@ -170,7 +172,7 @@ function translateError(key) {
 }
 
 function loadPayment(){
-    fetch("http://localhost:80/api/v1/pay/").then(res => res.json().then(data => {
+    fetch(`${urlApi}/api/v1/pay/`).then(res => res.json().then(data => {
         data.forEach(obj => {mapPayments.set(obj.id,obj.name);
             selectPayments += `<option id="op-modal-${obj.id}" value="${obj.id}">${obj.name}</option>`;})
     }));

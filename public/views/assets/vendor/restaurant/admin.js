@@ -14,6 +14,7 @@ let mapOrderTableTable = new Map();
 let mapTableOrder = new Map();
 let mapOrderTable = new Map();
 let payments;
+let urlApi = `${protocol}//${hostName}:30000`
 
 function updatePrice(id){
     document.getElementById(`p-${id}`).innerHTML = "Precio Total: "
@@ -53,10 +54,10 @@ function crudPayment(){
         return "Necesitas ingresar el nombre del método de pago";
     }
     if (id == 0){
-        url = `http://localhost:80/api/v1/pay/`;
+        url = `${urlApi}/api/v1/pay/`;
         method = `POST`;
     }else if (id > 0){
-        url = `http://localhost:80/api/v1/pay/${id}`;
+        url = `${urlApi}/api/v1/pay/${id}`;
         method = `PUT`;
     }else{
         return "ID no válida...";
@@ -81,7 +82,7 @@ function crudPayment(){
 }
 
 function fetchPayments(){
-    fetch(`http://localhost:80/api/v1/pay/`).then(res => {
+    fetch(`${urlApi}/api/v1/pay/`).then(res => {
         if (res.ok) {
             res.json().then(data => {payments = data; 
                 showCrudPayments();
@@ -137,7 +138,7 @@ function getShowOrderPendingByEstablishment(op){
 
 
 function getAllOrdersPendingByEstablishment(){
-    fetch(`http://localhost:80/api/v1/order/establishment/`).then(res => {
+    fetch(`${urlApi}/api/v1/order/establishment/`).then(res => {
         if (res.ok){ 
             let temp=`<div class="container">
                 <div class="section-title">
@@ -204,7 +205,7 @@ function getShowOrder(op){
 }
 
 function getAllOrdersByEstablishment(){
-    fetch(`http://localhost:80/api/v1/order/establishment/all`).then(res => {
+    fetch(`${urlApi}/api/v1/order/establishment/all`).then(res => {
     if (res.ok){
         res.json().then(data => {
             console.log(data)
@@ -261,7 +262,7 @@ function addOrderProductToOrder(tableID, products) {
 function addProductsToOrder(tableID, products){
     if (!mapTableOrder.has(tableID)){return `La mesa no esta en uso`;}
     let orderID = mapTableOrder.get(tableID)
-    fetch(`http://localhost:80/api/v1/order/${orderID}`, {
+    fetch(`${urlApi}/api/v1/order/${orderID}`, {
         method:"PUT",
         headers:{'Content-Type': 'application/json'},
         body:JSON.stringify(products)
@@ -295,7 +296,7 @@ function loadOrderProduct(product) {
 }
 
 function completeOrder(orderID, payID) {
-    fetch(`http://localhost:80/api/v1/order/${orderID}`, {
+    fetch(`${urlApi}/api/v1/order/${orderID}`, {
         body:JSON.stringify({"pay_id":payID}),
         method:"PATCH",
         headers:{'Content-Type': 'application/json'},
@@ -311,7 +312,7 @@ function completeOrder(orderID, payID) {
 }
 
 function completeOrderRemote(orderID) {
-    fetch(`http://localhost:80/api/v1/order/remote/${orderID}`, {
+    fetch(`${urlApi}/api/v1/order/remote/${orderID}`, {
         method:"PATCH",
         headers:{'Content-Type': 'application/json'},
     }).then(res => {
@@ -406,7 +407,7 @@ function showSelectEstablishments() {
 }*/
 
 function loadAllEstablishments(){
-    fetch(`http://localhost:80/api/v1/establishment/`,{method:"GET"}).then(res => res.json().then(data => {
+    fetch(`${urlApi}/api/v1/establishment/`,{method:"GET"}).then(res => res.json().then(data => {
         establishments = data;
         data.forEach(val => mapEstablishments.set(val.id,val));
         showCRUDEstablishment();
@@ -420,7 +421,7 @@ function SetMyAdmin(a) {
 }
 
 function loadMyEstablishments(){
-    fetch(`http://localhost:80/api/v1/establishment/${myAdmin.establishment_id}`,{method:"GET"}).then(res => res.json().then(data => {
+    fetch(`${urlApi}/api/v1/establishment/${myAdmin.establishment_id}`,{method:"GET"}).then(res => res.json().then(data => {
         myEstablishment = data;
         showMyOrder();
     })).catch(a => console.log(a));
@@ -437,7 +438,7 @@ function SetMyRole(a) {
 }
 
 function getMyRolePermissions(){
-    fetch(`http://localhost:80/api/v1/rol/${myAdmin.rol_id}`,{method:"GET"}).then(res => res.json().then(data => {
+    fetch(`${urlApi}/api/v1/rol/${myAdmin.rol_id}`,{method:"GET"}).then(res => res.json().then(data => {
         console.log("rol: ",data);
         SetMyRole(data);
     })).catch(a => console.log(a));
@@ -445,7 +446,7 @@ function getMyRolePermissions(){
 
 function getAllRoles(per){
     if (roles == null){
-        fetch(`http://localhost:80/api/v1/rol/`,{method:"GET"}).then(res => res.json().then(data => {
+        fetch(`${urlApi}/api/v1/rol/`,{method:"GET"}).then(res => res.json().then(data => {
         roles = data;
         if (per == 2){
             loadAllEstablishments();
@@ -467,7 +468,7 @@ function getAllRoles(per){
 
 function setImageToProduct(id, name) {
     let file = document.getElementById(id);
-    fetch(`http://localhost:80/api/v1/product/img/${name}`,{
+    fetch(`${urlApi}/api/v1/product/img/${name}`,{
         method:"POST",
         body:file,
         headers:{
@@ -480,7 +481,7 @@ function setImageToProduct(id, name) {
 function updateUserRol(){
     let id = parseInt(document.getElementById("hire-select-rol").value);
     let mail = document.getElementById("hire-input-email").value;
-    fetch(`http://localhost:80/api/v1/user/${mail}`,{
+    fetch(`${urlApi}/api/v1/user/${mail}`,{
         method:"PUT",
         body:{
             "rol_id":id,
@@ -517,7 +518,7 @@ function hireUser(){
             "establishment_id":establishment_id,
         }
     }
-    fetch(`http://localhost:80/api/v1/admin/hire/${email}`,{
+    fetch(`${urlApi}/api/v1/admin/hire/${email}`,{
         method:"PATCH",
         headers:{
             'Content-Type': 'application/json'
@@ -537,7 +538,7 @@ function hireUserInStablishment(){
     let rol_id = parseInt(document.getElementById("hire-select-rol-st").value);
     let email = document.getElementById("hire-input-email-st").value;
     if(email == "" || document.getElementById("hire-select-rol-st").value == ""){return "Necesitas llenar el formulario";}
-    fetch(`http://localhost:80/api/v1/user/hire/${email}`,{
+    fetch(`${urlApi}/api/v1/user/hire/${email}`,{
         method:"PATCH",
         headers:{
             'Content-Type': 'application/json'
@@ -573,15 +574,15 @@ function crudEstablishment(){
     };
     if (st == "0"){
         addressInit.method = "POST";
-        fetch("http://localhost:80/api/v1/address/", addressInit).then(res => res.json().then(data =>{
+        fetch(`${urlApi}/api/v1/address/`, addressInit).then(res => res.json().then(data =>{
             myInit.body = JSON.stringify({address_id:data});
-            fetch(`http://localhost:80/api/v1/establishment/${amountTables}`, myInit).then(res => {
+            fetch(`${urlApi}/api/v1/establishment/${amountTables}`, myInit).then(res => {
                 if(res.ok){showSuccessful()}else{res.json(x=>showError(translateError(x.message)))}
             });
         }))
     }else{
         addressInit.method = "PUT";
-        fetch(`http://localhost:80/api/v1/establishment/${st}`, addressInit).then(res => showResultFunction(res));
+        fetch(`${urlApi}/api/v1/establishment/${st}`, addressInit).then(res => showResultFunction(res));
     }
 }
 
@@ -645,7 +646,7 @@ function fireUser(){
     if(email == ""){
         return "Necesitas llenar el formulario";
     }
-    fetch(`http://localhost:80/api/v1/admin/fire/${email}`,{
+    fetch(`${urlApi}/api/v1/admin/fire/${email}`,{
         method:"PATCH",
     }).then(res => showResultFunction(res));
 }
@@ -655,7 +656,7 @@ function fireUserInStablishment(){
     if(email == ""){
         return "Necesitas llenar el formulario";
     }
-    fetch(`http://localhost:80/api/v1/user/fire/${email}`,{
+    fetch(`${urlApi}/api/v1/user/fire/${email}`,{
         method:"PATCH",
     }).then(res => showResultFunction(res));
 }
@@ -688,7 +689,7 @@ function menuAdmin(data){
 }
 
 function showMenu(){
-    fetch(`http://localhost:80/api/v1/product/`).then(res => res.json().then(data => {
+    fetch(`${urlApi}/api/v1/product/`).then(res => res.json().then(data => {
         if(myAdmin.rol_id <= 2){
             menuAdmin(data)
         }else{
@@ -711,7 +712,7 @@ function getSelectTableByEstablishment(){
 }
 
 function getAllOrdersPendingByUser(){
-    fetch("http://localhost:80/api/v1/order/user/").then(res =>
+    fetch(`${urlApi}/api/v1/order/user/`).then(res =>
         {
             if (res.status == 200){
                 res.json().then(data => {
@@ -752,7 +753,7 @@ function makeOrderInEstablishment(){
             },
             "order_products":products
         };
-        fetch("http://localhost:80/api/v1/order/", {
+        fetch(`${urlApi}/api/v1/order/`, {
             //credentials: 'same-origin',
             method: 'POST',
             body: JSON.stringify(orderProduct),
@@ -948,7 +949,7 @@ function deleteProduct() {
     if (document.getElementById("hidden-u").value == "" || id < 1){
         return `Selecciona un producto a eliminar`;
     }
-    fetch(`http://localhost:80/api/v1/product/${id}`,{
+    fetch(`${urlApi}/api/v1/product/${id}`,{
         method: "DELETE"
     }).then(res => {
         showResultFunction(res);
@@ -973,7 +974,7 @@ function updateProduct() {
     if (name == "" || document.getElementById("input-price-u").value == "" || description == "" || file == undefined){
         return `Necesitas llenar el formulario`;
     }
-    fetch(`http://localhost:80/api/v1/product/${id}`,{
+    fetch(`${urlApi}/api/v1/product/${id}`,{
         method: "PUT",
         body: JSON.stringify({
             "name":name,
@@ -1008,7 +1009,7 @@ function createProduct() {
         return `Necesitas completar el formulario`;
     }
     if(price <= 0){return `El precio tiene que ser mayor a cero`};
-    fetch("http://localhost:80/api/v1/product/",{
+    fetch(`${urlApi}/api/v1/product/`,{
         method: "POST",
         body: JSON.stringify({
             "name":name,
@@ -1031,7 +1032,7 @@ function createProduct() {
 
 async function isLogin (){
     var myInit = {method: 'GET'};
-    var myRequest = new Request('http://localhost:80/api/v1/user/login/', myInit);
+    var myRequest = new Request(`${urlApi}/api/v1/user/login/`, myInit);
     fetch(myRequest).then(res => {
         if (res.ok){
             res.json().then(a =>{
@@ -1043,30 +1044,30 @@ async function isLogin (){
 
 function updateNameImage(){
     nameImage = document.getElementById("input-name").value
-    document.getElementById("submit-product").formAction = `http://localhost:80/api/v1/product/img/${nameImage}`
+    document.getElementById("submit-product").formAction = `${urlApi}/api/v1/product/img/${nameImage}`
 }
 
 function sendFormSetImage(){
     nameImage = document.getElementById("input-name").value;
-    document.getElementById("form-set-image").action = `http://localhost:80/api/v1/product/img/${nameImage}`;
+    document.getElementById("form-set-image").action = `${urlApi}/api/v1/product/img/${nameImage}`;
     document.getElementById("form-set-image").submit();
 }
 
 function updateNameImageU(){
     nameUpdateImage = document.getElementById("input-name-u").value
-    document.getElementById("submit-product-u").formAction = `http://localhost:80/api/v1/product/img/${nameUpdateImage}`
+    document.getElementById("submit-product-u").formAction = `${urlApi}/api/v1/product/img/${nameUpdateImage}`
 }
 
 function sendFormSetImageU(){
     nameUpdateImage = document.getElementById("input-name-u").value;
-    document.getElementById("form-set-image-u").action = `http://localhost:80/api/v1/product/img/${nameUpdateImage}`;
+    document.getElementById("form-set-image-u").action = `${urlApi}/api/v1/product/img/${nameUpdateImage}`;
     document.getElementById("form-set-image-u").submit();
 }
 
 $('#form-set-image').submit(function () {
     $.ajax({
         type: $('#form-set-image').attr('method'), 
-        url: `"http://localhost:80/api/v1/product/img/${nameImage}"`,
+        url: `"${urlApi}/api/v1/product/img/${nameImage}"`,
         data: $('#form-set-image').serialize(),
         success: function (data) { console.log("Enviado") }  
     });
@@ -1076,7 +1077,7 @@ $('#form-set-image').submit(function () {
 $('#form-set-image-u').submit(function () {
     $.ajax({
         type: $('#form-set-image-u').attr('method'), 
-        url: `"http://localhost:80/api/v1/product/img/${nameUpdateImage}"`,
+        url: `"${urlApi}/api/v1/product/img/${nameUpdateImage}"`,
         data: $('#form-set-image-u').serialize(),
         success: function (data) { console.log("Enviado") }  
     });

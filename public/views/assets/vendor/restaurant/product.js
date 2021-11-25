@@ -5,10 +5,11 @@ let myOrders;
 let myUser;
 let total=0;
 let last=0;
+let urlApi = `${protocol}//${hostName}:30000`
 
 
 function fetchEstablishment() {
-    fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
+    fetch(`${urlApi}/api/v1/establishment/`).then(res => res.json().then(obj => {
         let temp = ``;
         establishments = obj;
         obj.forEach(val => temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`);
@@ -21,7 +22,7 @@ function updateUserEmailAndPassword() {
     let data = {
         "password":pwd
     }
-    fetch("http://localhost:80/api/v1/user/password/", {
+    fetch(`${urlApi}/api/v1/user/password/`, {
         //credentials: 'same-origin',
         method: 'PATCH',
         body: JSON.stringify(data),
@@ -95,7 +96,7 @@ function loadOrderSection(o) {
 }
 
 function loadAllOrders() {
-    fetch("http://localhost:80/api/v1/order/", {
+    fetch(`${urlApi}/api/v1/order/`, {
         method: 'GET',
         headers:{
             'Content-Type': 'application/json'
@@ -117,7 +118,7 @@ async function setMyOrders(data){
 
 function loadPay(data){
     if(mapPayments.size == 0){
-        fetch("http://localhost:80/api/v1/pay/").then(res => {
+        fetch(`${urlApi}/api/v1/pay/`).then(res => {
             res.json().then(d => {
                 d.forEach(x => mapPayments.set(x.id, x.name));
                 loadOrderSection(data);
@@ -130,7 +131,7 @@ function loadPay(data){
 
 async function loadPaymentMethod(){
     var myInit = {method: 'GET'};
-    var myRequest = new Request("http://localhost:80/api/v1/pay/", myInit);
+    var myRequest = new Request(`${urlApi}/api/v1/pay/`, myInit);
     fetch(myRequest).then(res => {
         res.json().then(
         data => {
@@ -167,7 +168,7 @@ function makeOrder(){
     };
     let idAddress;
     let products = [];
-    fetch("http://localhost:80/api/v1/address/", {
+    fetch(`${urlApi}/api/v1/address/`, {
         //credentials: 'same-origin',
         method: 'POST',
         body: JSON.stringify(dataAddress),
@@ -192,7 +193,7 @@ function makeOrder(){
                     },
                     "order_products":products
                 };
-                fetch("http://localhost:80/api/v1/order/remote/", {
+                fetch(`${urlApi}/api/v1/order/remote/`, {
                     //credentials: 'same-origin',
                     method: 'POST',
                     body: JSON.stringify(orderProduct),
@@ -351,8 +352,8 @@ function caseNotLogin() {
             <span id="password-error">Contraseña no válida</span>
             <div class="validate"></div>
         </div>
-        <div class="text-center"><button  type="button" disabled id="button-singup" onclick="post('http://localhost:80/api/v1/user/')">Registrar</button></div>
-        <div class="text-center"><button type="button" disabled id="button-login" onclick="post('http://localhost:80/api/v1/user/login/')">LogIn</button></div>
+        <div class="text-center"><button  type="button" disabled id="button-singup" onclick="post('${urlApi}/api/v1/user/')">Registrar</button></div>
+        <div class="text-center"><button type="button" disabled id="button-login" onclick="post('${urlApi}/api/v1/user/login/')">LogIn</button></div>
     </form>
     </div>`
     document.getElementById("book-a-table").innerHTML = temp;
@@ -361,7 +362,7 @@ function caseNotLogin() {
 }
 
 function sectionMyOrder() {
-    fetch("http://localhost:80/api/v1/establishment/").then(res => res.json().then(obj => {
+    fetch(`${urlApi}/api/v1/establishment/`).then(res => res.json().then(obj => {
         let temp = ``;
         obj.forEach(val => {temp += `<option value="${val.id}">${val.address.line1} / ${val.address.city} / ${val.address.postal_code}</option>`;
             mapEstablishments.set(val.id, val);        
@@ -456,7 +457,7 @@ async function setMyUser(data){
 
 function switchCaseSession() {
     var myInit = {method: 'GET'};
-    var myRequest = new Request('http://localhost:80/api/v1/user/login/', myInit);
+    var myRequest = new Request(`${urlApi}/api/v1/user/login/`, myInit);
     fetch(myRequest).then(res => {
         if (res.ok){
             var temp = `<a href="#menu">Realizar pedido</a>`;
@@ -585,7 +586,7 @@ function isValid() {
     
 function getAll() {
     modal = document.getElementById("myModal");
-    getMenu('http://localhost:80/api/v1/product/', loadMenuProduct);
+    getMenu(`${urlApi}/api/v1/product/`, loadMenuProduct);
     switchCaseSession();
     showNavResponse();
 }
