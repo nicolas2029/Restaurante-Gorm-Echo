@@ -5,9 +5,9 @@ let myOrders;
 let myUser;
 let total=0;
 let last=0;
-let hostName = window.location.hostname
-let protocol = window.location.protocol
-let urlApi = `${protocol}//${hostName}:30000`
+// let hostName = window.location.hostname
+// let protocol = window.location.protocol
+// let urlApi = `${protocol}//${hostName}:30000`
 
 
 function fetchEstablishment() {

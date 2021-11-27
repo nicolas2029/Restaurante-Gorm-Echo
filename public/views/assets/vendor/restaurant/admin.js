@@ -14,9 +14,9 @@ let mapOrderTableTable = new Map();
 let mapTableOrder = new Map();
 let mapOrderTable = new Map();
 let payments;
-let hostName = window.location.hostname
-let protocol = window.location.protocol
-let urlApi = `${protocol}//${hostName}:30000`
+// let hostName = window.location.hostname
+// let protocol = window.location.protocol
+// let urlApi = `${protocol}//${hostName}:30000`
 
 function updatePrice(id){
     document.getElementById(`p-${id}`).innerHTML = "Precio Total: "
